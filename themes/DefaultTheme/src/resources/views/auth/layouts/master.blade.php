@@ -48,7 +48,7 @@
                     <div class="col-12 text-center">
                         <div class="logo-area-mini-header">
                             <a href="/">
-                                <img src="{{ option('info_logo', theme_asset('img/logo.png')) }}" alt="{{ option('info_site_title', trans('front::messages.auth.laravel-shop')) }}">
+                                <img src="{{ theme_asset('img/logo.png') }}" alt="{{ option('info_site_title', trans('front::messages.auth.laravel-shop')) }}">
                             </a>
                         </div>
                     </div>

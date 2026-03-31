@@ -17,3 +17,6 @@ yarn-error.log
 
 .idea/
 .vscode/
+
+# User-provided temporary branding assets
+themes/DefaultTheme/src/resources/assets/img/logo-ariamobile.png

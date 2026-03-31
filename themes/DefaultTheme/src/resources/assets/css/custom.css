@@ -128,3 +128,81 @@
     color: black !important;
     margin-bottom: 3px;
 }
+
+/* Aria Mobile wholesale color identity */
+body {
+    background: #f3f8ff;
+}
+
+.main-header .topbar,
+.bottom-header,
+.footer,
+.mobile-footer {
+    background-color: #ffffff;
+    border: 1px solid #d7e8ff;
+}
+
+.bottom-header,
+.main-header {
+    box-shadow: 0 10px 24px rgba(16, 73, 155, 0.08);
+}
+
+a,
+.text-primary,
+.text-info {
+    color: #0b46a1 !important;
+}
+
+.btn-primary,
+.btn-info,
+.add-to-cart,
+.btn-add-to-cart,
+.search-area form.search button {
+    background: linear-gradient(135deg, #10499b, #1ea7df) !important;
+    border-color: #10499b !important;
+    color: #fff !important;
+}
+
+.btn-primary:hover,
+.btn-info:hover,
+.add-to-cart:hover,
+.btn-add-to-cart:hover,
+.search-area form.search button:hover {
+    background: linear-gradient(135deg, #0c3d84, #178ec0) !important;
+}
+
+.product-card,
+.product-box,
+.widget-box,
+.category-product,
+.cart-page-content,
+.checkout,
+.main-content,
+.dt-sn {
+    border: 1px solid #d7e8ff;
+    box-shadow: 0 8px 20px rgba(16, 73, 155, 0.07);
+    border-radius: 12px;
+}
+
+.price,
+.product-price,
+.offer,
+.discount,
+.amount {
+    color: #10499b !important;
+    font-weight: 700;
+}
+
+.logo-area img,
+.auth-logo img,
+.mobile-header-logo img {
+    max-height: 72px;
+    width: auto;
+}
+
+/* Ensure any legacy wholesale announcement strip is hidden */
+.wholesale-top-strip,
+.wholesale-top-strip__content,
+.wholesale-badge {
+    display: none !important;
+}
