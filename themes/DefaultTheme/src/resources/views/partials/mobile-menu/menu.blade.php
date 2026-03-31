@@ -8,7 +8,7 @@
 <div class="side-menu">
     <div class="logo-nav-res dt-sl text-center">
         <a href="#">
-            <img data-src="{{ option('info_logo', theme_asset('img/logo.png')) }}" alt="{{ option('info_site_title',  trans('front::messages.partials.laravel-shop')) }}">
+            <img data-src="{{ theme_asset('img/logo.png') }}" alt="{{ option('info_site_title',  trans('front::messages.partials.laravel-shop')) }}">
         </a>
     </div>
     <div class="search-box-side-menu dt-sl text-center mt-2 mb-3">
