@@ -128,3 +128,74 @@
     color: black !important;
     margin-bottom: 3px;
 }
+
+/* Wholesale visual identity */
+body {
+    background: #f5f7fb;
+}
+
+.wholesale-top-strip {
+    background: linear-gradient(90deg, #0b1f3a, #163a63);
+    border-radius: 14px;
+    margin-top: 14px;
+    margin-bottom: 12px;
+    box-shadow: 0 10px 24px rgba(11, 31, 58, 0.16);
+}
+
+.wholesale-top-strip__content {
+    color: #e9f1ff;
+    padding: 10px 18px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.wholesale-badge {
+    background: #ffb703;
+    color: #1a1a1a;
+    font-weight: 700;
+    border-radius: 999px;
+    padding: 4px 12px;
+    font-size: 12px;
+    white-space: nowrap;
+}
+
+.main-header,
+.main-container .topbar,
+.bottom-header,
+.main-slider,
+.footer,
+.product-card,
+.product-box,
+.widget-box,
+.dt-sl {
+    border-radius: 12px;
+}
+
+.product-card,
+.product-box,
+.widget-box,
+.category-product,
+.cart-page-content,
+.checkout,
+.main-content {
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+}
+
+.price,
+.product-price,
+.offer,
+.discount {
+    color: #0f4c81 !important;
+    font-weight: 700;
+}
+
+.btn,
+.add-to-cart,
+.btn-add-to-cart {
+    border-radius: 10px !important;
+    font-weight: 600;
+}
