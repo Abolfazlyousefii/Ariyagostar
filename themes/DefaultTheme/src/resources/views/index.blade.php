@@ -22,7 +22,7 @@
             "@type": "WebSite",
             "url": "{{ route('front.index') }}",
             "name": "{{ option('site_title') }}",
-            "logo": "{{ option('info_logo') ? asset(option('info_logo')) : asset(config('front.asset_path') . 'img/logo.png') }}",
+            "logo": "{{ asset(config('front.asset_path') . 'img/logo.png') }}",
             "potentialAction": {
                 "@type": "SearchAction",
                 "target": "{{ route('front.products.search') }}/?q={search_term_string}",
