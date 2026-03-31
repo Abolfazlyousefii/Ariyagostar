@@ -11,7 +11,7 @@
     <div class="col-12 order-1 main-slider-fixed-width-wrapper">
         <!-- Start main-slider -->
         @if ($main_sliders->count())
-            <section id="main-slider" class="main-slider main-slider-cs mt-1 carousel slide carousel-fade card hidden-sm main-slider-fixed-width" data-ride="carousel">
+            <section id="main-slider" class="main-slider main-slider-cs mt-1 carousel slide carousel-fade card hidden-sm main-slider-fixed-width" data-ride="carousel" style="width:1300px;max-width:100%;height:400px;overflow:hidden;border-radius:10px;margin:0 auto;">
                 <ol class="carousel-indicators">
                     @foreach ($main_sliders as $slider)
                         <li data-target="#main-slider" data-slide-to="{{ $loop->index }}" class="{{ $loop->first ? 'active' : '' }}"></li>
@@ -21,7 +21,7 @@
                     @foreach ($main_sliders as $slider)
                         <div class="carousel-item {{ $loop->first ? 'active' : '' }}">
                             <a class="main-slider-slide" href="{{ $slider->link }}">
-                                <img src="{{ asset($slider->image) }}" alt="{{ $slider->title }}" class="img-fluid">
+                                <img src="{{ asset($slider->image) }}" alt="{{ $slider->title }}" class="img-fluid" style="width:100%;height:400px;object-fit:cover;">
                             </a>
                         </div>
                     @endforeach
@@ -37,7 +37,7 @@
         @endif
 
         @if ($mobile_sliders->count())
-            <section id="main-slider-res" class="main-slider carousel slide carousel-fade card d-none show-sm main-slider-fixed-width" data-ride="carousel">
+            <section id="main-slider-res" class="main-slider carousel slide carousel-fade card d-none show-sm main-slider-fixed-width" data-ride="carousel" style="width:1300px;max-width:100%;height:400px;overflow:hidden;border-radius:10px;margin:0 auto;">
                 <ol class="carousel-indicators">
                     @foreach ($mobile_sliders as $slider)
                         <li data-target="#main-slider-res" data-slide-to="{{ $loop->index }}" class="{{ $loop->first ? 'active' : '' }}"></li>
@@ -47,7 +47,7 @@
                     @foreach ($mobile_sliders as $slider)
                         <div class="carousel-item {{ $loop->first ? 'active' : '' }}">
                             <a class="main-slider-slide" href="{{ $slider->link }}">
-                                <img src="{{ asset($slider->image) }}" alt="{{ $slider->title }}" class="img-fluid">
+                                <img src="{{ asset($slider->image) }}" alt="{{ $slider->title }}" class="img-fluid" style="width:100%;height:400px;object-fit:cover;">
                             </a>
                         </div>
                     @endforeach
