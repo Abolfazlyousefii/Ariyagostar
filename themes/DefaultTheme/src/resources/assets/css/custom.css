@@ -199,3 +199,10 @@ a,
     max-height: 72px;
     width: auto;
 }
+
+/* Ensure any legacy wholesale announcement strip is hidden */
+.wholesale-top-strip,
+.wholesale-top-strip__content,
+.wholesale-badge {
+    display: none !important;
+}
