@@ -206,3 +206,15 @@ a,
 .wholesale-badge {
     display: none !important;
 }
+
+
+/* Main hero banner width per request */
+.main-slider-fixed-width-wrapper {
+    display: flex;
+    justify-content: center;
+}
+
+.main-slider-fixed-width {
+    width: 400px;
+    max-width: 100%;
+}

@@ -8,10 +8,10 @@
 <div class="row index-main-slider mb-3">
 
 
-    <div class="col-12 order-1">
+    <div class="col-12 order-1 main-slider-fixed-width-wrapper">
         <!-- Start main-slider -->
         @if ($main_sliders->count())
-            <section id="main-slider" class="main-slider main-slider-cs mt-1 carousel slide carousel-fade card hidden-sm" data-ride="carousel">
+            <section id="main-slider" class="main-slider main-slider-cs mt-1 carousel slide carousel-fade card hidden-sm main-slider-fixed-width" data-ride="carousel">
                 <ol class="carousel-indicators">
                     @foreach ($main_sliders as $slider)
                         <li data-target="#main-slider" data-slide-to="{{ $loop->index }}" class="{{ $loop->first ? 'active' : '' }}"></li>
@@ -37,7 +37,7 @@
         @endif
 
         @if ($mobile_sliders->count())
-            <section id="main-slider-res" class="main-slider carousel slide carousel-fade card d-none show-sm" data-ride="carousel">
+            <section id="main-slider-res" class="main-slider carousel slide carousel-fade card d-none show-sm main-slider-fixed-width" data-ride="carousel">
                 <ol class="carousel-indicators">
                     @foreach ($mobile_sliders as $slider)
                         <li data-target="#main-slider-res" data-slide-to="{{ $loop->index }}" class="{{ $loop->first ? 'active' : '' }}"></li>
