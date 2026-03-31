@@ -75,6 +75,12 @@
 
             <!-- Start topbar -->
             <div class="container main-container">
+                <div class="wholesale-top-strip">
+                    <div class="wholesale-top-strip__content">
+                        <span class="wholesale-badge">پخش عمده</span>
+                        <span>تأمین مستقیم لوازم جانبی موبایل برای فروشگاه‌ها</span>
+                    </div>
+                </div>
                 <div class="topbar dt-sl">
                     <div class="row align-items-center">
                         <div class="col-lg-2 col-md-3 col-4">
