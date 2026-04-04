@@ -46,9 +46,10 @@
             <div class="container">
                 <div class="row">
                     <div class="col-12 text-center">
+                        @php($siteLogo = option('info_logo') ? asset(option('info_logo')) : theme_asset('img/logo.png'))
                         <div class="logo-area-mini-header">
                             <a href="/">
-                                <img src="{{ theme_asset('img/logo.png') }}" alt="{{ option('info_site_title', trans('front::messages.auth.laravel-shop')) }}">
+                                <img src="{{ $siteLogo }}" alt="{{ option('info_site_title', trans('front::messages.auth.laravel-shop')) }}">
                             </a>
                         </div>
                     </div>
