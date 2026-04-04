@@ -1,9 +1,6 @@
 (function () {
     function removeWholesaleTopText() {
-        var targetTexts = [
-            'پخش عمده تأمین مستقیم لوازم جانبی موبایل برای فروشگاه‌ها',
-            'پخش عمده تأمین مستقیم لوازم جانبی موبایل برای فروشگاه‌ه'
-        ];
+
 
         var selectors = ['.wholesale-top-strip', '.wholesale-top-strip__content', '.wholesale-badge'];
         selectors.forEach(function (selector) {
