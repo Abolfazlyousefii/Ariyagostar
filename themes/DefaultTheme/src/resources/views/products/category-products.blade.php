@@ -12,10 +12,10 @@
     <meta name="bingbot" content="index, follow">
     @endif
     <meta property="og:title" content="{{ $category->meta_title ?: $category->title }}" />
-    <meta property="og:url" content="{{ route('front.products.category-products', ['category' => $category]) }}" />
+    <meta property="og:url" content="{{ request()->url() }}" />
     <meta name="description" content="{{ $category->meta_description ?: $category->description }}">
     <meta name="keywords" content="{{ $category->getTags }}">
-    <link rel="canonical" href="{{ route('front.products.category-products', ['category' => $category]) }}" />
+    <link rel="canonical" href="{{ request()->url() }}" />
 @endpush
 
 @push('befor-styles')

@@ -19,7 +19,7 @@ class Post extends Model implements Sitemapable
 
     public function toSitemapTag(): Url|string|array
     {
-        return Url::create(route("front.posts.show", $this))
+        return Url::create(route("front.blog.show", $this))
             ->setLastModificationDate(Carbon::create($this->updated_at));
     }
 
@@ -61,7 +61,7 @@ class Post extends Model implements Sitemapable
 
     public function link()
     {
-        return route('front.posts.show', ['post' => $this]);
+        return route('front.blog.show', ['post' => $this]);
     }
 
     public function scopePublished($query)

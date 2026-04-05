@@ -1,7 +1,7 @@
 @extends('front::layouts.master', ['title' => $category->title])
 
 @push('meta')
-    <link rel="canonical" href="{{ route('front.posts.category', ['category' => $category]) }}" />
+    <link rel="canonical" href="{{ route('front.blog.category', ['category' => $category]) }}" />
 @endpush
 
 @section('content')
@@ -15,7 +15,7 @@
                        <div class="breadcrumb dt-sl">
                            <nav>
                                <a href="/">{{ trans('front::messages.posts.home') }}</a>
-                               <a href="{{ route('front.posts.index') }}">{{ trans('front::messages.posts.blog') }}</a>
+                               <a href="{{ route('front.blog.index') }}">{{ trans('front::messages.posts.blog') }}</a>
                                <a href="#">{{ $category->title }}</a>
                            </nav>
                        </div>
@@ -34,14 +34,14 @@
                                 <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6 col-12">
                                     <div class="post-card">
                                         <div class="post-thumbnail">
-                                            <a href="{{ route('front.posts.show', ['post' => $post]) }}">
+                                            <a href="{{ route('front.blog.show', ['post' => $post]) }}">
                                                 <img data-src="{{ $post->image ? $post->image : theme_asset('images/blog-empty-image.jpg') }}" alt="{{ $post->title }}">
                                             </a>
                                             <span class="post-tag">{{ $post->category ? $post->category->title : trans('front::messages.posts.uncategorized') }}</span>
 
                                         </div>
                                         <div class="post-title">
-                                            <a href="{{ route('front.posts.show', ['post' => $post]) }}">{{ $post->title }}</a>
+                                            <a href="{{ route('front.blog.show', ['post' => $post]) }}">{{ $post->title }}</a>
                                             <span class="post-date">{{ jdate($post->created_at)->format('%d %B %Y') }}</span>
                                         </div>
                                     </div>
