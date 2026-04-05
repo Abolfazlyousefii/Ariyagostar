@@ -38,7 +38,7 @@
 
             <!-- mega menu 5 column -->
             <li class="list-item list-item-has-children menu-col-1">
-                <a class="nav-link" href="{{ route('front.posts.index') }}">{{ $menu->title }}</a>
+                <a class="nav-link" href="{{ route('front.blog.index') }}">{{ $menu->title }}</a>
                 <ul class="sub-menu nav">
                     @foreach($postcats as $category)
                         @include('front::partials.menu.child-category', ['category' => $category])
