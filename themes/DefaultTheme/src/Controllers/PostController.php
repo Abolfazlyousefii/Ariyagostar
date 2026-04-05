@@ -10,11 +10,46 @@ use Illuminate\Validation\Rule;
 
 class PostController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $posts = Post::detectLang()->published()->latest()->paginate(12);
+        $validated = $request->validate([
+            'q' => ['nullable', 'string', 'max:120'],
+            'category' => ['nullable', 'integer', Rule::exists('categories', 'id')->where('type', 'postcat')],
+        ]);
 
-        return view('front::posts.index', compact('posts'));
+        $searchTerm = trim($validated['q'] ?? '');
+        $activeCategoryId = $validated['category'] ?? null;
+
+        $postsQuery = Post::detectLang()
+            ->published()
+            ->with('category')
+            ->when($searchTerm !== '', function ($query) use ($searchTerm) {
+                $query->where(function ($innerQuery) use ($searchTerm) {
+                    $innerQuery
+                        ->where('title', 'like', '%' . $searchTerm . '%')
+                        ->orWhere('short_description', 'like', '%' . $searchTerm . '%')
+                        ->orWhere('content', 'like', '%' . $searchTerm . '%');
+                });
+            })
+            ->when($activeCategoryId, function ($query) use ($activeCategoryId) {
+                $query->where('category_id', $activeCategoryId);
+            })
+            ->latest();
+
+        $posts = $postsQuery->paginate(9)->withQueryString();
+
+        $categories = Category::detectLang()
+            ->where('type', 'postcat')
+            ->orderBy('title')
+            ->get();
+
+        $featuredPost = Post::detectLang()
+            ->published()
+            ->with('category')
+            ->latest()
+            ->first();
+
+        return view('front::posts.index', compact('posts', 'categories', 'activeCategoryId', 'searchTerm', 'featuredPost'));
     }
 
     public function category(Category $category)
