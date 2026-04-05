@@ -62,16 +62,6 @@ function get_widget($widget)
             break;
         }
 
-        case 'coworker-sliders': {
-            $variables['coworker_sliders'] = Slider::detectLang()->where('group', 'coworker_sliders')
-                ->where('published', true)
-                ->orderBy('ordering')
-                ->take($widget->option('number', 2))
-                ->get();
-
-            break;
-        }
-
         case 'sevices-sliders': {
             $variables['sevices_sliders'] = Slider::detectLang()->where('group', 'sevices_sliders')
                 ->where('published', true)
@@ -519,20 +509,6 @@ function widget_seeder()
                         'key' => 'image',
                         'value' => theme_asset("img/theme/amazing-2.png"),
                     ],
-                    [
-                        'key' => 'number',
-                        'value' => '10',
-                    ],
-                ]
-            ],
-            [
-                'widget' => [
-                    'title' => 'اسلایدر لوگو همکاران',
-                    'key' => 'coworker-sliders',
-                    'theme' => $theme,
-                    'ordering' => 8
-                ],
-                'options' => [
                     [
                         'key' => 'number',
                         'value' => '10',

@@ -59,11 +59,6 @@
                     @case('middle-banners')
                         @include('front::widgets.middle-banners')
                     @break
-
-                    @case('coworker-sliders')
-                        @include('front::widgets.coworker-sliders')
-                    @break
-
                     @case('sevices-sliders')
                         @include('front::widgets.sevices-sliders')
                     @break
