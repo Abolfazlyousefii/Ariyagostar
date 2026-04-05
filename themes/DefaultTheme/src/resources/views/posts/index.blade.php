@@ -1,13 +1,25 @@
-@extends('front::layouts.master', ['title' => trans('front::messages.posts.blog')])
+@extends('front::layouts.master', ['title' => isset($page) ? $page->title : trans('front::messages.posts.blog')])
 
 @php
     $metaDescription = trans('front::messages.posts.blog-meta-description');
+    $blogBaseUrl = $blogBaseUrl ?? route('front.posts.index');
+    $allowIndexing = isset($page) ? option('allow_indexing_page_id_' . $page->id) !== 'off' : option('allow_indexing_blog_page') !== 'off';
     $canonicalQuery = request()->except('page');
-    $canonicalUrl = route('front.posts.index', $canonicalQuery);
+    $queryString = http_build_query(array_filter($canonicalQuery, function ($value) {
+        return $value !== null && $value !== '';
+    }));
+    $canonicalUrl = $queryString ? $blogBaseUrl . '?' . $queryString : $blogBaseUrl;
+    $buildBlogUrl = function (array $params = []) use ($blogBaseUrl) {
+        $query = http_build_query(array_filter($params, function ($value) {
+            return $value !== null && $value !== '';
+        }));
+
+        return $query ? $blogBaseUrl . '?' . $query : $blogBaseUrl;
+    };
 @endphp
 
 @push('meta')
-    @if(option('allow_indexing_blog_page') == "off")
+    @if(!$allowIndexing)
         <meta name="robots" content="noindex, nofollow">
         <meta name="googlebot" content="noindex, nofollow">
         <meta name="bingbot" content="noindex, nofollow">
@@ -36,7 +48,7 @@
             "@type": "Blog",
             "name": "{{ trans('front::messages.posts.blog') }}",
             "description": "{{ $metaDescription }}",
-            "url": "{{ route('front.posts.index') }}",
+            "url": "{{ $canonicalUrl }}",
             "publisher": {
                 "@type": "Organization",
                 "name": "{{ option('info_site_title') }}"
@@ -50,7 +62,7 @@
         <div class="container main-container">
             <nav class="breadcrumb dt-sl premium-blog__breadcrumb" aria-label="Breadcrumb">
                 <a href="/">{{ trans('front::messages.posts.home') }}</a>
-                <a href="{{ route('front.posts.index') }}" aria-current="page">{{ trans('front::messages.posts.blog') }}</a>
+                <a href="{{ $blogBaseUrl }}" aria-current="page">{{ trans('front::messages.posts.blog') }}</a>
             </nav>
 
             <section class="premium-blog__hero dt-sn" aria-labelledby="blog-main-heading">
@@ -81,7 +93,7 @@
             </section>
 
             <section class="premium-blog__filters dt-sn" aria-label="{{ trans('front::messages.posts.blog-filters') }}">
-                <form action="{{ route('front.posts.index') }}" method="get" id="blog-filter-form" class="premium-blog__filters-form">
+                <form action="{{ $blogBaseUrl }}" method="get" id="blog-filter-form" class="premium-blog__filters-form">
                     <label class="sr-only" for="blog-search">{{ trans('front::messages.posts.search-label') }}</label>
                     <div class="premium-blog__search-wrap">
                         <i class="mdi mdi-magnify" aria-hidden="true"></i>
@@ -98,12 +110,12 @@
                     </div>
 
                     <div class="premium-blog__categories" role="group" aria-label="{{ trans('front::messages.posts.categories') }}">
-                        <a href="{{ route('front.posts.index', ['q' => $searchTerm ?: null]) }}" class="premium-blog__category {{ !$activeCategoryId ? 'is-active' : '' }}">
+                        <a href="{{ $buildBlogUrl(['q' => $searchTerm ?: null]) }}" class="premium-blog__category {{ !$activeCategoryId ? 'is-active' : '' }}">
                             {{ trans('front::messages.posts.all-categories') }}
                         </a>
                         @foreach($categories as $category)
                             <a
-                                href="{{ route('front.posts.index', ['q' => $searchTerm ?: null, 'category' => $category->id]) }}"
+                                href="{{ $buildBlogUrl(['q' => $searchTerm ?: null, 'category' => $category->id]) }}"
                                 class="premium-blog__category {{ (int) $activeCategoryId === (int) $category->id ? 'is-active' : '' }}"
                             >
                                 {{ $category->title }}
@@ -178,7 +190,7 @@
                         <i class="mdi mdi-file-search-outline" aria-hidden="true"></i>
                         <h3>{{ trans('front::messages.posts.empty-title') }}</h3>
                         <p>{{ trans('front::messages.posts.empty-description') }}</p>
-                        <a href="{{ route('front.posts.index') }}" class="btn btn-primary">{{ trans('front::messages.posts.reset-filters') }}</a>
+                        <a href="{{ $blogBaseUrl }}" class="btn btn-primary">{{ trans('front::messages.posts.reset-filters') }}</a>
                     </div>
                 @endif
             </section>
