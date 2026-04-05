@@ -24,14 +24,14 @@
                                 <div class="item">
                                     <div class="post-card mb-0">
                                         <div class="post-thumbnail">
-                                            <a href="{{ route('front.posts.show', ['post' => $post]) }}">
+                                            <a href="{{ route('front.blog.show', ['post' => $post]) }}">
                                                 <img src="{{ theme_asset('images/blog-empty-image.jpg') }}" data-src="{{ $post->image ? asset($post->image) : theme_asset('images/blog-empty-image.jpg') }}" alt="{{ $post->title }}">
                                             </a>
                                             <span class="post-tag">{{ $post->category ? $post->category->title : trans('front::messages.user.uncategorized')  }}</span>
 
                                         </div>
                                         <div class="post-title">
-                                            <a href="{{ route('front.posts.show', ['post' => $post]) }}">{{ $post->title }}</a>
+                                            <a href="{{ route('front.blog.show', ['post' => $post]) }}">{{ $post->title }}</a>
                                             <span class="post-date">{{ jdate($post->created_at)->format('%d %B %Y') }}</span>
                                         </div>
                                     </div>

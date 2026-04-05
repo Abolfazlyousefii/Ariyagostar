@@ -26,7 +26,12 @@ Route::group(['as' => 'front.'], function () {
     Route::get('/', [MainController::class, 'index'])->name('index');
     Route::get('/get-new-captcha', [MainController::class, 'captcha']);
 
-    // ------------------ posts
+    // ------------------ posts / blog
+    Route::get('blog', [PostController::class, 'index'])->name('blog.index');
+    Route::get('blog/{post}', [PostController::class, 'show'])->name('blog.show');
+    Route::get('blog/category/{category}', [PostController::class, 'category'])->name('blog.category');
+
+    // legacy post URLs (kept for backward compatibility)
     Route::resource('posts', PostController::class)->only(['index', 'show']);
     Route::get('posts/category/{category}', [PostController::class, 'category'])->name('posts.category');
 

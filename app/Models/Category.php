@@ -150,7 +150,7 @@ class Category extends Model implements Sitemapable
             return route('front.products.category-products', ['category' => $this]);
         }
 
-        return route('front.posts.category', ['category' => $this]);
+        return route('front.blog.category', ['category' => $this]);
     }
 
     public function parent()

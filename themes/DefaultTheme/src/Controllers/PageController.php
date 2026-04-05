@@ -16,42 +16,7 @@ class PageController extends Controller
         $page = Page::detectLang()->where('slug', $page)->orWhere('id', $page)->firstOrFail();
 
         if ($this->isBlogPage($page)) {
-            $validated = $request->validate([
-                'q' => ['nullable', 'string', 'max:120'],
-                'category' => ['nullable', 'integer', Rule::exists('categories', 'id')->where('type', 'postcat')],
-            ]);
-
-            $searchTerm = trim($validated['q'] ?? '');
-            $activeCategoryId = $validated['category'] ?? null;
-
-            $postsQuery = Post::detectLang()
-                ->published()
-                ->with('category')
-                ->when($searchTerm !== '', function ($query) use ($searchTerm) {
-                    $query->where(function ($innerQuery) use ($searchTerm) {
-                        $innerQuery
-                            ->where('title', 'like', '%' . $searchTerm . '%')
-                            ->orWhere('short_description', 'like', '%' . $searchTerm . '%')
-                            ->orWhere('content', 'like', '%' . $searchTerm . '%');
-                    });
-                })
-                ->when($activeCategoryId !== null, function ($query) use ($activeCategoryId) {
-                    $query->where('category_id', $activeCategoryId);
-                })
-                ->latest();
-
-            $posts = $postsQuery->paginate(9)->withQueryString();
-
-            $categories = Category::detectLang()
-                ->where('type', 'postcat')
-                ->published()
-                ->orderBy('ordering')
-                ->get();
-
-            $featuredPost = (clone $postsQuery)->first();
-            $blogBaseUrl = route('front.pages.show', ['page' => $page]);
-
-            return view('front::posts.index', compact('posts', 'categories', 'activeCategoryId', 'searchTerm', 'featuredPost', 'blogBaseUrl', 'page'));
+            return redirect()->route('front.blog.index', $request->query());
         }
 
         return view('front::pages.show', compact('page'));

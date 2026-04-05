@@ -29,7 +29,7 @@ class GenerateSitemap extends Command
         $posts = Post::published()->latest('updated_at')->get();
         foreach ($posts as $post) {
             $sitemap->add(
-                route('front.posts.show', ['post' => $post]),
+                route('front.blog.show', ['post' => $post]),
                 $post->updated_at->toW3cString(),
                 '0.9',
                 'weekly'
@@ -65,7 +65,7 @@ class GenerateSitemap extends Command
         $postsSitemap = Sitemap::create();
         foreach ($posts as $post) {
             $postsSitemap->add(
-                route('front.posts.show', ['post' => $post]),
+                route('front.blog.show', ['post' => $post]),
                 $post->updated_at->toW3cString(),
                 '0.9',
                 'weekly'

@@ -2,7 +2,7 @@
 
 @php
     $metaDescription = trans('front::messages.posts.blog-meta-description');
-    $blogBaseUrl = $blogBaseUrl ?? route('front.posts.index');
+    $blogBaseUrl = $blogBaseUrl ?? route('front.blog.index');
     $allowIndexing = isset($page) ? option('allow_indexing_page_id_' . $page->id) !== 'off' : option('allow_indexing_blog_page') !== 'off';
     $canonicalQuery = request()->except('page');
     $queryString = http_build_query(array_filter($canonicalQuery, function ($value) {
@@ -84,7 +84,7 @@
                         <div class="premium-blog__featured-content">
                             <span class="premium-blog__chip">{{ trans('front::messages.posts.featured') }}</span>
                             <h2>
-                                <a href="{{ route('front.posts.show', ['post' => $featuredPost]) }}">{{ $featuredPost->title }}</a>
+                                <a href="{{ route('front.blog.show', ['post' => $featuredPost]) }}">{{ $featuredPost->title }}</a>
                             </h2>
                             <p>{{ \Illuminate\Support\Str::limit(strip_tags($featuredPost->short_description ?: $featuredPost->content), 140) }}</p>
                         </div>
@@ -155,7 +155,7 @@
                             @endphp
                             <div class="col-xl-4 col-md-6 col-12 mb-4 d-flex">
                                 <article class="premium-post-card dt-sn w-100">
-                                    <a class="premium-post-card__media" href="{{ route('front.posts.show', ['post' => $post]) }}" aria-label="{{ trans('front::messages.posts.read-article', ['title' => $post->title]) }}">
+                                    <a class="premium-post-card__media" href="{{ route('front.blog.show', ['post' => $post]) }}" aria-label="{{ trans('front::messages.posts.read-article', ['title' => $post->title]) }}">
                                         <img loading="lazy" src="{{ $postImage }}" alt="{{ $post->title }}">
                                     </a>
 
@@ -167,12 +167,12 @@
                                         </div>
 
                                         <h3>
-                                            <a href="{{ route('front.posts.show', ['post' => $post]) }}">{{ $post->title }}</a>
+                                            <a href="{{ route('front.blog.show', ['post' => $post]) }}">{{ $post->title }}</a>
                                         </h3>
 
                                         <p>{{ $excerpt }}</p>
 
-                                        <a class="premium-post-card__cta" href="{{ route('front.posts.show', ['post' => $post]) }}">
+                                        <a class="premium-post-card__cta" href="{{ route('front.blog.show', ['post' => $post]) }}">
                                             {{ trans('front::messages.posts.continue-reading') }}
                                             <i class="mdi mdi-arrow-left" aria-hidden="true"></i>
                                         </a>
