@@ -6,9 +6,10 @@
     </div>
 </button>
 <div class="side-menu">
+    @php($siteLogo = option('info_logo') ? asset(option('info_logo')) : theme_asset('img/logo.png'))
     <div class="logo-nav-res dt-sl text-center">
         <a href="#">
-            <img data-src="{{ theme_asset('img/logo.png') }}" alt="{{ option('info_site_title',  trans('front::messages.partials.laravel-shop')) }}">
+            <img data-src="{{ $siteLogo }}" alt="{{ option('info_site_title',  trans('front::messages.partials.laravel-shop')) }}">
         </a>
     </div>
     <div class="search-box-side-menu dt-sl text-center mt-2 mb-3">

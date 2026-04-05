@@ -80,10 +80,11 @@
                 </div>
                 <div class="topbar dt-sl">
                     <div class="row align-items-center">
+                        @php($siteLogo = option('info_logo') ? asset(option('info_logo')) : theme_asset('img/logo.png'))
                         <div class="col-lg-2 col-md-3 col-4">
                             <div class="logo-area float-right">
                                 <a href="{{ route('front.index') }}">
-                                    <img data-src="{{ theme_asset('img/AriyaLogo.png') }}" alt="{{ option('info_site_title', 'لاراول شاپ') }}">
+                                    <img data-src="{{ theme_asset('img/AriyaLogo.png') }}" alt="{{ option('info_site_title', 'لاراول شاپ') }}" style="width: 75px;">
                                 </a>
                             </div>
                         </div>
