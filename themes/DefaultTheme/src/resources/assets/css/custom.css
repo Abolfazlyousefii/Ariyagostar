@@ -388,6 +388,20 @@ a,
     padding: 0.58rem 1.1rem;
 }
 
+
+.premium-blog__loading {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: #5f7696;
+    margin-bottom: 0.75rem;
+    font-size: 0.85rem;
+}
+
+.premium-blog__loading[hidden] {
+    display: none;
+}
+
 .premium-blog__listing-head {
     display: flex;
     align-items: baseline;

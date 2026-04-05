@@ -31,7 +31,7 @@ class PostController extends Controller
                         ->orWhere('content', 'like', '%' . $searchTerm . '%');
                 });
             })
-            ->when($activeCategoryId, function ($query) use ($activeCategoryId) {
+            ->when($activeCategoryId !== null, function ($query) use ($activeCategoryId) {
                 $query->where('category_id', $activeCategoryId);
             })
             ->latest();
@@ -40,14 +40,11 @@ class PostController extends Controller
 
         $categories = Category::detectLang()
             ->where('type', 'postcat')
-            ->orderBy('title')
+            ->published()
+            ->orderBy('ordering')
             ->get();
 
-        $featuredPost = Post::detectLang()
-            ->published()
-            ->with('category')
-            ->latest()
-            ->first();
+        $featuredPost = (clone $postsQuery)->first();
 
         return view('front::posts.index', compact('posts', 'categories', 'activeCategoryId', 'searchTerm', 'featuredPost'));
     }
