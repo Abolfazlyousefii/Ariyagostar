@@ -3,8 +3,11 @@
 namespace Themes\DefaultTheme\src\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Models\Category;
 use App\Models\Page;
+use App\Models\Post;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class PageController extends Controller
 {
