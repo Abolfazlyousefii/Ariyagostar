@@ -4,25 +4,30 @@
             <li class="list-item list-item-has-children position-static">
                 <a class="nav-link" href="{{ route('front.products.index') }}">{{ $menu->title }}</a>
 
-                <ul class="f-menu sub-menu nav">
+                <ul class="f-menu sub-menu nav products-mega-menu" role="menu" aria-label="{{ $menu->title }}">
                     @foreach ($productcats as $category)
-                        <li class="{{ $loop->first ? 'active' : '' }}">
-                            <a class="master-menu" href="{{ $category->link }}">{{ $category->title }}</a>
-                            <div class="megadrop row">
-                                @if ($category->getCategoriesCount())
+                        <li class="{{ $loop->first ? 'active' : '' }}" role="none">
+                            <a class="master-menu" role="menuitem" href="{{ $category->link }}">{{ $category->title }}</a>
 
+                            <div class="megadrop row" role="group" aria-label="{{ $category->title }}">
+                                @if ($category->getCategoriesCount())
                                     @foreach ($category->getCategories() as $childCategory)
-                                        <a href="{{ $childCategory->link }}"><div class="h5">{{ $childCategory->title }}</div></a>
+                                        <a class="mega-level-2" href="{{ $childCategory->link }}">
+                                            <div class="h5">{{ $childCategory->title }}</div>
+                                        </a>
 
                                         @if ($childCategory->getCategoriesCount())
-
                                             @foreach ($childCategory->getCategories() as $child2)
-                                                <a href="{{ $child2->link }}"><div class="h6">{{ $child2->title }}</div></a>
+                                                <a class="mega-level-3" href="{{ $child2->link }}">
+                                                    <div class="h6">{{ $child2->title }}</div>
+                                                </a>
                                             @endforeach
-
                                         @endif
                                     @endforeach
-
+                                @else
+                                    <a class="mega-level-2" href="{{ $category->link }}">
+                                        <div class="h5">{{ trans('front::messages.partials.all-items-thiscategory') }}</div>
+                                    </a>
                                 @endif
                             </div>
                         </li>

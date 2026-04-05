@@ -46,6 +46,23 @@ class ProductController extends Controller
     {
         $this->isShowable($category);
 
+        return $this->renderCategoryProductsPage($category);
+    }
+
+    public function section(Category $parent, Category $child)
+    {
+        $this->isShowable($parent);
+        $this->isShowable($child);
+
+        if ((int) $child->category_id !== (int) $parent->id || $parent->type !== 'productcat' || $child->type !== 'productcat') {
+            abort(404);
+        }
+
+        return $this->renderCategoryProductsPage($child);
+    }
+
+    private function renderCategoryProductsPage(Category $category)
+    {
         $ids       = $category->allPublishedProducts()->pluck('id');
         $products  = Product::orderByStock()->frontFilter($category)->latest()->whereIn('products.id', $ids)->paginate(20);
         $min_price = Price::where('stock', '>', 0)->whereIn('product_id', $ids)->min('price');

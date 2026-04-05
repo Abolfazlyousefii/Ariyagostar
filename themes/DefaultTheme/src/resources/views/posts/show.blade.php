@@ -13,10 +13,10 @@
     @endif
     <meta property="og:title" content="{{ $post->meta_title ?: $post->title }}" />
     <meta property="og:type" content="article" />
-    <meta property="og:url" content="{{ route('front.posts.show', ['post' => $post]) }}" />
+    <meta property="og:url" content="{{ route('front.blog.show', ['post' => $post]) }}" />
     <meta name="description" content="{{ $post->meta_description ?: $post->short_description }}">
     <meta name="keywords" content="{{ $post->getTags }}">
-    <link rel="canonical" href="{{ route('front.posts.show', ['post' => $post]) }}" />
+    <link rel="canonical" href="{{ route('front.blog.show', ['post' => $post]) }}" />
 
     @if ($post->image)
         <meta property="og:image" content="{{ asset($post->image) }}">
@@ -37,7 +37,7 @@
                         <div class="breadcrumb dt-sl">
                             <nav>
                                 <a href="/">{{ trans('front::messages.posts.home') }}</a>
-                                <a href="{{ route('front.posts.index') }}">{{ trans('front::messages.posts.blog') }}</a>
+                                <a href="{{ route('front.blog.index') }}">{{ trans('front::messages.posts.blog') }}</a>
                                 <a href="#">{{ $post->title }}</a>
                             </nav>
                         </div>
@@ -63,7 +63,7 @@
                                     <div class="post-meta category">
                                         <i class="mdi mdi-folder"></i>
 
-                                        <a href="{{ route('front.posts.category', ['category' => $post->category]) }}">{{ $post->category->title }}</a>
+                                        <a href="{{ route('front.blog.category', ['category' => $post->category]) }}">{{ $post->category->title }}</a>
                                     </div>
                                 @endif
                                 <div class="post-meta category">
