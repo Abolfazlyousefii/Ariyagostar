@@ -58,6 +58,9 @@ class FooterBuilderService
             'instagram' => option('social_instagram'),
             'telegram' => option('social_telegram'),
             'whatsapp' => option('social_whatsapp'),
+            'instagram_icon' => option('footer_contact_instagram_icon', ''),
+            'telegram_icon' => option('footer_contact_telegram_icon', ''),
+            'whatsapp_icon' => option('footer_contact_whatsapp_icon', ''),
 
             'show_instagram' => true,
             'show_telegram' => true,
