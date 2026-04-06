@@ -1,22 +1,27 @@
 <!-- Start footer -->
 @php
-    $quickLinks = collect($links)->take(4);
+    $quickLinks = collect($links)->filter(function ($link) {
+        return filled($link->title ?? null) && filled($link->link ?? null);
+    })->take(4);
 
     if ($quickLinks->isEmpty()) {
         $quickLinks = collect([
             (object) ['title' => 'صفحه اصلی', 'link' => route('front.index')],
-            (object) ['title' => 'محصولات', 'link' => route('front.products.index')],
-            (object) ['title' => 'بلاگ', 'link' => route('front.blog.index')],
+            (object) ['title' => 'فروشگاه', 'link' => route('front.products.index')],
+            (object) ['title' => 'وبلاگ', 'link' => route('front.blog.index')],
             (object) ['title' => 'تماس با ما', 'link' => route('front.contact.index')],
         ]);
     }
 
-    $aboutText = option('info_short_description')
-        ?: 'فروشگاه ما با ارائه محصولات متنوع، ضمانت اصالت و پشتیبانی پاسخگو، تجربه‌ای مطمئن و سریع از خرید آنلاین را برای مشتریان فراهم می‌کند.';
+    $aboutText = trim(strip_tags((string) option('info_short_description')));
+
+    if (!filled($aboutText)) {
+        $aboutText = 'ما با تمرکز بر کیفیت کالا، ارسال سریع و پشتیبانی پاسخ‌گو، تلاش می‌کنیم تجربه‌ای مطمئن و حرفه‌ای از خرید آنلاین برای مشتریان فراهم کنیم.';
+    }
 @endphp
 
-<footer class="main-footer main-footer--modern dt-sl position-relative">
-    <div class="footer-back-to-top">
+<footer class="main-footer footer-pro dt-sl position-relative">
+    <div class="footer-pro__back-to-top">
         <a href="#" aria-label="بازگشت به بالا">
             <i class="mdi mdi-chevron-up"></i>
             <span>{{ trans('front::messages.index.back-to-top') }}</span>
@@ -24,35 +29,36 @@
     </div>
 
     <div class="container main-container">
-        <div class="footer-modern__content">
+        <div class="footer-pro__wrapper">
             <div class="row">
-                <div class="col-12 col-md-6 col-lg-4 mb-4 mb-lg-0">
-                    <section class="footer-modern__section">
-                        <h3 class="footer-modern__title">دسترسی سریع</h3>
-                        <ul class="footer-modern__links list-unstyled mb-0">
+                <div class="col-12 col-md-6 col-lg-4 mb-3 mb-lg-0">
+                    <section class="footer-pro__section">
+                        <h3 class="footer-pro__title">دسترسی سریع</h3>
+                        <ul class="footer-pro__links list-unstyled mb-0">
                             @foreach($quickLinks as $link)
                                 <li>
-                                    <a href="{{ $link->link }}">{{ $link->title }}</a>
+                                    <a href="{{ $link->link }}">
+                                        <i class="mdi mdi-chevron-left"></i>
+                                        <span>{{ $link->title }}</span>
+                                    </a>
                                 </li>
                             @endforeach
                         </ul>
                     </section>
                 </div>
 
-                <div class="col-12 col-md-6 col-lg-4 mb-4 mb-lg-0">
-                    <section class="footer-modern__section">
-                        <h3 class="footer-modern__title">معرفی شرکت</h3>
-                        <p class="footer-modern__about mb-0">
-                            {{ \Illuminate\Support\Str::limit(strip_tags($aboutText), 220) }}
-                        </p>
+                <div class="col-12 col-md-6 col-lg-4 mb-3 mb-lg-0">
+                    <section class="footer-pro__section">
+                        <h3 class="footer-pro__title">معرفی شرکت</h3>
+                        <p class="footer-pro__about mb-0">{{ \Illuminate\Support\Str::limit($aboutText, 240) }}</p>
                     </section>
                 </div>
 
                 <div class="col-12 col-lg-4">
-                    <section class="footer-modern__section">
-                        <h3 class="footer-modern__title">تماس با ما</h3>
+                    <section class="footer-pro__section">
+                        <h3 class="footer-pro__title">تماس با ما</h3>
 
-                        <ul class="footer-modern__contact list-unstyled mb-0">
+                        <ul class="footer-pro__contact list-unstyled mb-0">
                             @if(option('info_address'))
                                 <li>
                                     <i class="mdi mdi-map-marker-outline"></i>
@@ -75,7 +81,7 @@
                             @endif
                         </ul>
 
-                        <div class="footer-modern__socials" aria-label="شبکه‌های اجتماعی">
+                        <div class="footer-pro__socials" aria-label="شبکه‌های اجتماعی">
                             @if(option('social_instagram'))
                                 <a href="{{ option('social_instagram') }}" target="_blank" rel="noopener" aria-label="اینستاگرام">
                                     <i class="mdi mdi-instagram"></i>
@@ -96,13 +102,12 @@
                         </div>
 
                         @if(option('info_enamad') || option('info_samandehi'))
-                            <div class="footer-modern__trusts">
+                            <div class="footer-pro__trusts" aria-label="نماد اعتماد الکترونیکی">
                                 @if(option('info_enamad'))
-                                    <div class="footer-modern__trust-item">{!! option('info_enamad') !!}</div>
+                                    <div class="footer-pro__trust-item">{!! option('info_enamad') !!}</div>
                                 @endif
-
                                 @if(option('info_samandehi'))
-                                    <div class="footer-modern__trust-item">{!! option('info_samandehi') !!}</div>
+                                    <div class="footer-pro__trust-item">{!! option('info_samandehi') !!}</div>
                                 @endif
                             </div>
                         @endif
@@ -112,7 +117,7 @@
         </div>
     </div>
 
-    <div class="copyright">
+    <div class="copyright footer-pro__copyright">
         <div class="container main-container">
             <p class="text-center mb-0">{{ option('info_footer_text') }}</p>
         </div>
