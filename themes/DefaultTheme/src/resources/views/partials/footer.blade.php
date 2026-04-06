@@ -1,112 +1,78 @@
 <!-- Start footer -->
-@php
-    $quickLinks = collect($links)->filter(function ($link) {
-        return filled($link->title ?? null) && filled($link->link ?? null);
-    })->take(4);
-
-    $aboutText = trim(strip_tags((string) option('info_short_description')));
-@endphp
-
-<footer class="main-footer main-footer--modern dt-sl position-relative">
-    <div class="footer-back-to-top">
-        <a href="#" aria-label="بازگشت به بالا">
-            <i class="mdi mdi-chevron-up"></i>
-            <span>{{ trans('front::messages.index.back-to-top') }}</span>
-        </a>
+<footer class="main-footer dt-sl position-relative">
+    <div class="back-to-top">
+        <a href="#"><span class="icon"><i class="mdi mdi-chevron-up"></i></span> <span>{{ trans('front::messages.index.back-to-top') }}</span></a>
     </div>
-
     <div class="container main-container">
-        <div class="footer-modern__content">
+
+
+        <div class="footer-widgets">
             <div class="row">
-                <div class="col-12 col-md-6 col-lg-4 mb-4 mb-lg-0">
-                    <section class="footer-modern__section">
-                        <h3 class="footer-modern__title">دسترسی سریع</h3>
-                        @if($quickLinks->isNotEmpty())
-                            <ul class="footer-modern__links list-unstyled mb-0">
-                                @foreach($quickLinks as $link)
+                @foreach($footer_links as $group)
+                    <div class="col-12 col-md-6 col-lg-3">
+                        <div class="widget-menu widget card">
+                            <header class="card-header">
+                                <h3 class="card-title">{{ option('link_groups_' . $group['key'], $group['name']) }}</h3>
+                            </header>
+                            <ul class="footer-menu">
+                                @foreach($links->where('link_group_id', $group['key']) as $link)
                                     <li>
-                                        <a href="{{ $link->link }}">
-                                            <i class="mdi mdi-chevron-left"></i>
-                                            <span>{{ $link->title }}</span>
-                                        </a>
+                                        <a href="{{ $link->link }}">{{ $link->title }}</a>
                                     </li>
                                 @endforeach
                             </ul>
-                        @endif
-                    </section>
-                </div>
 
-                <div class="col-12 col-md-6 col-lg-4 mb-4 mb-lg-0">
-                    <section class="footer-modern__section">
-                        <h3 class="footer-modern__title">معرفی کوتاه شرکت</h3>
-                        @if(filled($aboutText))
-                            <p class="footer-modern__about mb-0">
-                                {{ \Illuminate\Support\Str::limit($aboutText, 260) }}
-                            </p>
-                        @endif
-                    </section>
-                </div>
-
-                <div class="col-12 col-lg-4">
-                    <section class="footer-modern__section">
-                        <h3 class="footer-modern__title">آدرس و اطلاعات تماس</h3>
-
-                        <ul class="footer-modern__contact list-unstyled mb-0">
-                            @if(option('info_address'))
-                                <li>
-                                    <i class="mdi mdi-map-marker-outline"></i>
-                                    <span>{{ option('info_address') }}</span>
-                                </li>
-                            @endif
-
-                            @if(option('info_tel'))
-                                <li>
-                                    <i class="mdi mdi-phone-outline"></i>
-                                    <a href="tel:{{ option('info_tel') }}">{{ option('info_tel') }}</a>
-                                </li>
-                            @endif
-                        </ul>
-
-                        <div class="footer-modern__socials" aria-label="شبکه‌های اجتماعی">
-                            @if(option('social_instagram'))
-                                <a href="{{ option('social_instagram') }}" target="_blank" rel="noopener" aria-label="اینستاگرام" title="اینستاگرام">
-                                    <i class="mdi mdi-instagram"></i>
-                                </a>
-                            @endif
-
-                            @if(option('social_telegram'))
-                                <a href="{{ option('social_telegram') }}" target="_blank" rel="noopener" aria-label="تلگرام" title="تلگرام">
-                                    <i class="mdi mdi-telegram"></i>
-                                </a>
-                            @endif
-
-                            @if(option('social_whatsapp'))
-                                <a href="{{ option('social_whatsapp') }}" target="_blank" rel="noopener" aria-label="واتساپ" title="واتساپ">
-                                    <i class="mdi mdi-whatsapp"></i>
-                                </a>
-                            @endif
                         </div>
+                    </div>
+                @endforeach
 
-                        @if(option('info_enamad') || option('info_samandehi'))
-                            <div class="footer-modern__trusts" aria-label="نماد اعتماد">
-                                @if(option('info_enamad'))
-                                    <div class="footer-modern__trust-item">{!! option('info_enamad') !!}</div>
-                                @endif
+                <div class="col-12 col-md-6 col-lg-3">
 
-                                @if(option('info_samandehi'))
-                                    <div class="footer-modern__trust-item">{!! option('info_samandehi') !!}</div>
-                                @endif
-                            </div>
+                    <div class="symbol footer-logo">
+
+                        @if(option('info_enamad'))
+                            {!! option('info_enamad') !!}
                         @endif
-                    </section>
+
+                        @if(option('info_samandehi'))
+                            {!! option('info_samandehi') !!}
+                        @endif
+
+                    </div>
+                    <div class="socials">
+                        <div class="footer-social">
+                            <ul class="text-center">
+                                @if(option('social_instagram'))
+                                    <li><a href="{{ option('social_instagram') }}"><i class="mdi mdi-instagram"></i></a></li>
+                                @endif
+
+                                @if(option('social_whatsapp'))
+                                    <li><a href="{{ option('social_whatsapp') }}"><i class="mdi mdi-whatsapp"></i></a></li>
+                                @endif
+
+                                @if(option('social_telegram'))
+                                    <li><a href="{{ option('social_telegram') }}"><i class="mdi mdi-telegram"></i></a></li>
+                                @endif
+
+                                @if(option('social_facebook'))
+                                    <li><a href="{{ option('social_facebook') }}"><i class="mdi mdi-facebook"></i></a></li>
+                                @endif
+
+                                @if(option('social_twitter'))
+                                    <li><a href="{{ option('social_twitter') }}"><i class="mdi mdi-twitter"></i></a></li>
+                                @endif
+
+                            </ul>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
 
+    </div>
     <div class="copyright">
         <div class="container main-container">
-            <p class="text-center mb-0">{{ option('info_footer_text') }}</p>
+            <p class="text-center">{{ option('info_footer_text') }}</p>
         </div>
     </div>
 </footer>
