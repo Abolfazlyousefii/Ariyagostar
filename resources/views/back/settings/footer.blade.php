@@ -61,30 +61,6 @@
                                                 <label>متن معرفی کوتاه</label>
                                                 <textarea class="form-control" name="footer_company_description" rows="4">{{ $company_description }}</textarea>
                                             </fieldset>
-                                            <div class="row">
-                                                <div class="col-md-6 form-group">
-                                                    <label>تصویر معرفی شرکت (اختیاری)</label>
-                                                    <div class="custom-file">
-                                                        <input type="file" name="footer_company_image" class="custom-file-input" accept="image/*">
-                                                        <label class="custom-file-label">انتخاب تصویر</label>
-                                                    </div>
-                                                    @if(!empty(option('footer_company_image')))
-                                                        <div class="mt-1">
-                                                            <a href="{{ asset(option('footer_company_image')) }}" target="_blank" rel="noopener noreferrer">مشاهده تصویر فعلی</a>
-                                                        </div>
-                                                        <div class="custom-control custom-switch mt-1">
-                                                            <input type="checkbox" class="custom-control-input" id="footer_company_image_remove" name="footer_company_image_remove" value="1">
-                                                            <label class="custom-control-label" for="footer_company_image_remove">حذف تصویر فعلی</label>
-                                                        </div>
-                                                    @endif
-                                                </div>
-                                                <div class="col-md-6 form-group d-flex align-items-end">
-                                                    <div class="custom-control custom-switch">
-                                                        <input type="checkbox" class="custom-control-input" id="footer_company_show_image" name="footer_company_show_image" value="1" {{ option('footer_company_show_image', '0') === '1' ? 'checked' : '' }}>
-                                                        <label class="custom-control-label" for="footer_company_show_image">نمایش تصویر در فوتر</label>
-                                                    </div>
-                                                </div>
-                                            </div>
                                         </div>
                                     </div>
 
@@ -122,17 +98,6 @@
                                                 <div class="col-md-4 form-group">
                                                     <label>لینک اینستاگرام</label>
                                                     <input type="url" class="form-control ltr" name="contact_instagram" value="{{ $contact_data['instagram'] ?? '' }}">
-                                                    <div class="custom-file mt-1">
-                                                        <input type="file" name="contact_instagram_icon" class="custom-file-input" accept=".svg,image/svg+xml">
-                                                        <label class="custom-file-label">SVG اختصاصی اینستاگرام</label>
-                                                    </div>
-                                                    @if(!empty($contact_data['instagram_icon']))
-                                                        <small class="d-block mt-1">آیکن فعلی: <a target="_blank" href="{{ asset($contact_data['instagram_icon']) }}">مشاهده</a></small>
-                                                        <div class="custom-control custom-switch mt-1">
-                                                            <input type="checkbox" class="custom-control-input" id="contact_instagram_icon_remove" name="contact_instagram_icon_remove" value="1">
-                                                            <label class="custom-control-label" for="contact_instagram_icon_remove">حذف SVG اختصاصی</label>
-                                                        </div>
-                                                    @endif
                                                     <div class="custom-control custom-switch mt-1">
                                                         <input type="checkbox" class="custom-control-input" id="contact_show_instagram" name="contact_show_instagram" value="1" {{ !empty($contact_data['show_instagram']) ? 'checked' : '' }}>
                                                         <label class="custom-control-label" for="contact_show_instagram">نمایش اینستاگرام</label>
@@ -141,17 +106,6 @@
                                                 <div class="col-md-4 form-group">
                                                     <label>لینک تلگرام</label>
                                                     <input type="url" class="form-control ltr" name="contact_telegram" value="{{ $contact_data['telegram'] ?? '' }}">
-                                                    <div class="custom-file mt-1">
-                                                        <input type="file" name="contact_telegram_icon" class="custom-file-input" accept=".svg,image/svg+xml">
-                                                        <label class="custom-file-label">SVG اختصاصی تلگرام</label>
-                                                    </div>
-                                                    @if(!empty($contact_data['telegram_icon']))
-                                                        <small class="d-block mt-1">آیکن فعلی: <a target="_blank" href="{{ asset($contact_data['telegram_icon']) }}">مشاهده</a></small>
-                                                        <div class="custom-control custom-switch mt-1">
-                                                            <input type="checkbox" class="custom-control-input" id="contact_telegram_icon_remove" name="contact_telegram_icon_remove" value="1">
-                                                            <label class="custom-control-label" for="contact_telegram_icon_remove">حذف SVG اختصاصی</label>
-                                                        </div>
-                                                    @endif
                                                     <div class="custom-control custom-switch mt-1">
                                                         <input type="checkbox" class="custom-control-input" id="contact_show_telegram" name="contact_show_telegram" value="1" {{ !empty($contact_data['show_telegram']) ? 'checked' : '' }}>
                                                         <label class="custom-control-label" for="contact_show_telegram">نمایش تلگرام</label>
@@ -160,17 +114,6 @@
                                                 <div class="col-md-4 form-group">
                                                     <label>لینک واتساپ</label>
                                                     <input type="url" class="form-control ltr" name="contact_whatsapp" value="{{ $contact_data['whatsapp'] ?? '' }}">
-                                                    <div class="custom-file mt-1">
-                                                        <input type="file" name="contact_whatsapp_icon" class="custom-file-input" accept=".svg,image/svg+xml">
-                                                        <label class="custom-file-label">SVG اختصاصی واتساپ</label>
-                                                    </div>
-                                                    @if(!empty($contact_data['whatsapp_icon']))
-                                                        <small class="d-block mt-1">آیکن فعلی: <a target="_blank" href="{{ asset($contact_data['whatsapp_icon']) }}">مشاهده</a></small>
-                                                        <div class="custom-control custom-switch mt-1">
-                                                            <input type="checkbox" class="custom-control-input" id="contact_whatsapp_icon_remove" name="contact_whatsapp_icon_remove" value="1">
-                                                            <label class="custom-control-label" for="contact_whatsapp_icon_remove">حذف SVG اختصاصی</label>
-                                                        </div>
-                                                    @endif
                                                     <div class="custom-control custom-switch mt-1">
                                                         <input type="checkbox" class="custom-control-input" id="contact_show_whatsapp" name="contact_show_whatsapp" value="1" {{ !empty($contact_data['show_whatsapp']) ? 'checked' : '' }}>
                                                         <label class="custom-control-label" for="contact_show_whatsapp">نمایش واتساپ</label>
