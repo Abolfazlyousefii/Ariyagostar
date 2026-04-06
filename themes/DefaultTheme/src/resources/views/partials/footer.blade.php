@@ -1,78 +1,120 @@
 <!-- Start footer -->
-<footer class="main-footer dt-sl position-relative">
-    <div class="back-to-top">
-        <a href="#"><span class="icon"><i class="mdi mdi-chevron-up"></i></span> <span>{{ trans('front::messages.index.back-to-top') }}</span></a>
+@php
+    $quickLinks = collect($links)->take(4);
+
+    if ($quickLinks->isEmpty()) {
+        $quickLinks = collect([
+            (object) ['title' => 'صفحه اصلی', 'link' => route('front.index')],
+            (object) ['title' => 'محصولات', 'link' => route('front.products.index')],
+            (object) ['title' => 'بلاگ', 'link' => route('front.blog.index')],
+            (object) ['title' => 'تماس با ما', 'link' => route('front.contact.index')],
+        ]);
+    }
+
+    $aboutText = option('info_short_description')
+        ?: 'فروشگاه ما با ارائه محصولات متنوع، ضمانت اصالت و پشتیبانی پاسخگو، تجربه‌ای مطمئن و سریع از خرید آنلاین را برای مشتریان فراهم می‌کند.';
+@endphp
+
+<footer class="main-footer main-footer--modern dt-sl position-relative">
+    <div class="footer-back-to-top">
+        <a href="#" aria-label="بازگشت به بالا">
+            <i class="mdi mdi-chevron-up"></i>
+            <span>{{ trans('front::messages.index.back-to-top') }}</span>
+        </a>
     </div>
+
     <div class="container main-container">
-
-
-        <div class="footer-widgets">
+        <div class="footer-modern__content">
             <div class="row">
-                @foreach($footer_links as $group)
-                    <div class="col-12 col-md-6 col-lg-3">
-                        <div class="widget-menu widget card">
-                            <header class="card-header">
-                                <h3 class="card-title">{{ option('link_groups_' . $group['key'], $group['name']) }}</h3>
-                            </header>
-                            <ul class="footer-menu">
-                                @foreach($links->where('link_group_id', $group['key']) as $link)
-                                    <li>
-                                        <a href="{{ $link->link }}">{{ $link->title }}</a>
-                                    </li>
-                                @endforeach
-                            </ul>
+                <div class="col-12 col-md-6 col-lg-4 mb-4 mb-lg-0">
+                    <section class="footer-modern__section">
+                        <h3 class="footer-modern__title">دسترسی سریع</h3>
+                        <ul class="footer-modern__links list-unstyled mb-0">
+                            @foreach($quickLinks as $link)
+                                <li>
+                                    <a href="{{ $link->link }}">{{ $link->title }}</a>
+                                </li>
+                            @endforeach
+                        </ul>
+                    </section>
+                </div>
 
+                <div class="col-12 col-md-6 col-lg-4 mb-4 mb-lg-0">
+                    <section class="footer-modern__section">
+                        <h3 class="footer-modern__title">معرفی شرکت</h3>
+                        <p class="footer-modern__about mb-0">
+                            {{ \Illuminate\Support\Str::limit(strip_tags($aboutText), 220) }}
+                        </p>
+                    </section>
+                </div>
+
+                <div class="col-12 col-lg-4">
+                    <section class="footer-modern__section">
+                        <h3 class="footer-modern__title">تماس با ما</h3>
+
+                        <ul class="footer-modern__contact list-unstyled mb-0">
+                            @if(option('info_address'))
+                                <li>
+                                    <i class="mdi mdi-map-marker-outline"></i>
+                                    <span>{{ option('info_address') }}</span>
+                                </li>
+                            @endif
+
+                            @if(option('info_tel'))
+                                <li>
+                                    <i class="mdi mdi-phone-outline"></i>
+                                    <a href="tel:{{ option('info_tel') }}">{{ option('info_tel') }}</a>
+                                </li>
+                            @endif
+
+                            @if(option('info_email'))
+                                <li>
+                                    <i class="mdi mdi-email-outline"></i>
+                                    <a href="mailto:{{ option('info_email') }}">{{ option('info_email') }}</a>
+                                </li>
+                            @endif
+                        </ul>
+
+                        <div class="footer-modern__socials" aria-label="شبکه‌های اجتماعی">
+                            @if(option('social_instagram'))
+                                <a href="{{ option('social_instagram') }}" target="_blank" rel="noopener" aria-label="اینستاگرام">
+                                    <i class="mdi mdi-instagram"></i>
+                                </a>
+                            @endif
+
+                            @if(option('social_telegram'))
+                                <a href="{{ option('social_telegram') }}" target="_blank" rel="noopener" aria-label="تلگرام">
+                                    <i class="mdi mdi-telegram"></i>
+                                </a>
+                            @endif
+
+                            @if(option('social_whatsapp'))
+                                <a href="{{ option('social_whatsapp') }}" target="_blank" rel="noopener" aria-label="واتساپ">
+                                    <i class="mdi mdi-whatsapp"></i>
+                                </a>
+                            @endif
                         </div>
-                    </div>
-                @endforeach
 
-                <div class="col-12 col-md-6 col-lg-3">
+                        @if(option('info_enamad') || option('info_samandehi'))
+                            <div class="footer-modern__trusts">
+                                @if(option('info_enamad'))
+                                    <div class="footer-modern__trust-item">{!! option('info_enamad') !!}</div>
+                                @endif
 
-                    <div class="symbol footer-logo">
-
-                        @if(option('info_enamad'))
-                            {!! option('info_enamad') !!}
+                                @if(option('info_samandehi'))
+                                    <div class="footer-modern__trust-item">{!! option('info_samandehi') !!}</div>
+                                @endif
+                            </div>
                         @endif
-
-                        @if(option('info_samandehi'))
-                            {!! option('info_samandehi') !!}
-                        @endif
-
-                    </div>
-                    <div class="socials">
-                        <div class="footer-social">
-                            <ul class="text-center">
-                                @if(option('social_instagram'))
-                                    <li><a href="{{ option('social_instagram') }}"><i class="mdi mdi-instagram"></i></a></li>
-                                @endif
-
-                                @if(option('social_whatsapp'))
-                                    <li><a href="{{ option('social_whatsapp') }}"><i class="mdi mdi-whatsapp"></i></a></li>
-                                @endif
-
-                                @if(option('social_telegram'))
-                                    <li><a href="{{ option('social_telegram') }}"><i class="mdi mdi-telegram"></i></a></li>
-                                @endif
-
-                                @if(option('social_facebook'))
-                                    <li><a href="{{ option('social_facebook') }}"><i class="mdi mdi-facebook"></i></a></li>
-                                @endif
-
-                                @if(option('social_twitter'))
-                                    <li><a href="{{ option('social_twitter') }}"><i class="mdi mdi-twitter"></i></a></li>
-                                @endif
-
-                            </ul>
-                        </div>
-                    </div>
+                    </section>
                 </div>
             </div>
         </div>
-
     </div>
+
     <div class="copyright">
         <div class="container main-container">
-            <p class="text-center">{{ option('info_footer_text') }}</p>
+            <p class="text-center mb-0">{{ option('info_footer_text') }}</p>
         </div>
     </div>
 </footer>
