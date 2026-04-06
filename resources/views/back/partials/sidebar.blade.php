@@ -590,6 +590,13 @@
                             @endif
                         @endcan
 
+
+                        @can('settings.information')
+                            <li class="{{ active_class('admin.settings.footer') }}">
+                                <a href="{{ route('admin.settings.footer') }}"><i class="feather icon-circle"></i><span class="menu-item">مدیریت فوتر</span></a>
+                            </li>
+                        @endcan
+
                         @can('settings.gateway')
                             <li class="{{ active_class('admin.settings.gateways') }}">
                                 <a href="{{ route('admin.settings.gateways') }}"><i class="feather icon-circle"></i><span class="menu-item">درگاه های پرداخت</span></a>

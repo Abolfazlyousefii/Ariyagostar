@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Currency;
 use App\Models\Gateway;
 use App\Models\Province;
+use App\Services\FooterBuilderService;
 use App\Services\Sms\IppanelSms;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
@@ -227,6 +228,113 @@ class SettingController extends Controller
         foreach ($others as $key => $value) {
             option_update($key, $value);
         }
+
+        return response('success');
+    }
+
+
+    public function showFooter(FooterBuilderService $footerBuilderService)
+    {
+        $this->authorize('settings.information');
+
+        $sections = $footerBuilderService->getSections();
+        $quick_links = $footerBuilderService->getQuickLinks();
+        $contact_data = $footerBuilderService->getContactData();
+        $company_description = option('footer_company_description', option('info_short_description'));
+
+        return view('back.settings.footer', compact('sections', 'quick_links', 'contact_data', 'company_description'));
+    }
+
+    public function updateFooter(Request $request)
+    {
+        $this->authorize('settings.information');
+
+        $validated = $request->validate([
+            'sections' => 'required|array|min:1',
+            'sections.*.type' => 'required|in:quick_links,company_intro,contact_social,trust_badge',
+            'sections.*.title' => 'required|string|max:120',
+            'sections.*.sort_order' => 'nullable|integer|min:0',
+
+            'quick_links' => 'nullable|array|max:4',
+            'quick_links.*.label' => 'required_with:quick_links|string|max:120',
+            'quick_links.*.url' => 'required_with:quick_links|url|max:255',
+            'quick_links.*.sort_order' => 'nullable|integer|min:0',
+
+            'footer_company_description' => 'nullable|string|max:2000',
+
+            'contact_address' => 'nullable|string|max:1000',
+            'contact_phone' => 'nullable|string|max:64',
+            'contact_email' => 'nullable|email|max:255',
+            'contact_instagram' => 'nullable|url|max:255',
+            'contact_telegram' => 'nullable|url|max:255',
+            'contact_whatsapp' => 'nullable|url|max:255',
+            'contact_trust_badge_url' => 'nullable|url|max:255',
+            'contact_trust_badge_image' => 'nullable|image|max:2048',
+        ]);
+
+        $sections = collect($validated['sections'])->map(function ($section, $index) use ($request) {
+            return [
+                'type' => $section['type'],
+                'title' => $section['title'],
+                'enabled' => (bool) $request->input('sections.' . $index . '.enabled', false),
+                'sort_order' => (int) ($section['sort_order'] ?? ($index + 1)),
+            ];
+        })->sortBy('sort_order')->values()->all();
+
+        $quick_links = collect($validated['quick_links'] ?? [])->map(function ($item, $index) use ($request) {
+            return [
+                'label' => $item['label'],
+                'url' => $item['url'],
+                'enabled' => (bool) $request->input('quick_links.' . $index . '.enabled', false),
+                'sort_order' => (int) ($item['sort_order'] ?? ($index + 1)),
+            ];
+        })->sortBy('sort_order')->values()->take(4)->all();
+
+        $contact_data = [
+            'address' => $validated['contact_address'] ?? '',
+            'phone' => $validated['contact_phone'] ?? '',
+            'email' => $validated['contact_email'] ?? '',
+
+            'show_address' => (bool) $request->input('contact_show_address', false),
+            'show_phone' => (bool) $request->input('contact_show_phone', false),
+            'show_email' => (bool) $request->input('contact_show_email', false),
+
+            'instagram' => $validated['contact_instagram'] ?? '',
+            'telegram' => $validated['contact_telegram'] ?? '',
+            'whatsapp' => $validated['contact_whatsapp'] ?? '',
+
+            'show_instagram' => (bool) $request->input('contact_show_instagram', false),
+            'show_telegram' => (bool) $request->input('contact_show_telegram', false),
+            'show_whatsapp' => (bool) $request->input('contact_show_whatsapp', false),
+
+            'show_trust_badge' => (bool) $request->input('contact_show_trust_badge', false),
+            'trust_badge_url' => $validated['contact_trust_badge_url'] ?? '',
+            'trust_badge_image' => option('footer_trust_badge_image', ''),
+        ];
+
+        if ($request->hasFile('contact_trust_badge_image')) {
+            $imageName = time() . '_footer_trust_badge.' . $request->contact_trust_badge_image->getClientOriginalExtension();
+            $request->contact_trust_badge_image->move(public_path('uploads/'), $imageName);
+            $contact_data['trust_badge_image'] = '/uploads/' . $imageName;
+            option_update('footer_trust_badge_image', $contact_data['trust_badge_image']);
+        }
+
+        option_update('footer_sections', json_encode($sections, JSON_UNESCAPED_UNICODE));
+        option_update('footer_quick_links', json_encode($quick_links, JSON_UNESCAPED_UNICODE));
+        option_update('footer_company_description', $validated['footer_company_description'] ?? '');
+        option_update('footer_contact_data', json_encode($contact_data, JSON_UNESCAPED_UNICODE));
+
+        return response('success');
+    }
+
+    public function resetFooter(FooterBuilderService $footerBuilderService)
+    {
+        $this->authorize('settings.information');
+
+        option_update('footer_sections', json_encode($footerBuilderService->defaultSections(), JSON_UNESCAPED_UNICODE));
+        option_update('footer_quick_links', json_encode($footerBuilderService->defaultQuickLinks(), JSON_UNESCAPED_UNICODE));
+        option_update('footer_company_description', option('info_short_description'));
+        option_update('footer_contact_data', json_encode($footerBuilderService->defaultContactData(), JSON_UNESCAPED_UNICODE));
 
         return response('success');
     }
