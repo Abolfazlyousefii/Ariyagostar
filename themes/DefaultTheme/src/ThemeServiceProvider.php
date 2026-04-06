@@ -4,9 +4,9 @@ namespace Themes\DefaultTheme\src;
 
 use Illuminate\Support\ServiceProvider;
 use App\Models\Category;
-use App\Models\Link;
 use App\Models\Menu;
 use App\Models\Post;
+use App\Services\FooterBuilderService;
 use App\Models\Product;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Route;
@@ -71,11 +71,14 @@ class ThemeServiceProvider extends ServiceProvider
 
 
         view()->composer(['front::partials.footer'], function ($view) {
+            $footerBuilderService = app(FooterBuilderService::class);
 
-            $footer_links     = config('front.linkGroups', []);
-            $links            = Link::detectLang()->orderBy('ordering')->get();
+            $footerSections = $footerBuilderService->getSections();
+            $quickLinks = $footerBuilderService->getQuickLinks();
+            $contactData = $footerBuilderService->getContactData();
+            $companyDescription = option('footer_company_description', option('info_short_description'));
 
-            $view->with(compact('footer_links', 'links'));
+            $view->with(compact('footerSections', 'quickLinks', 'contactData', 'companyDescription'));
         });
 
         view()->composer(['front::partials.menu.menu', 'front::partials.mobile-menu.menu'], function ($view) {

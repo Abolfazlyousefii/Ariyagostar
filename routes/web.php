@@ -327,6 +327,10 @@ Route::group(['as' => 'admin.', 'prefix' => 'admin/' . admin_route_prefix(), 'mi
     Route::get('settings/others', [SettingController::class, 'showOthers'])->name('settings.others');
     Route::post('settings/others', [SettingController::class, 'updateOthers']);
 
+    Route::get('settings/footer', [SettingController::class, 'showFooter'])->name('settings.footer');
+    Route::post('settings/footer', [SettingController::class, 'updateFooter']);
+    Route::post('settings/footer/reset', [SettingController::class, 'resetFooter'])->name('settings.footer.reset');
+
     Route::get('settings/sms', [SettingController::class, 'showSms'])->name('settings.sms');
     Route::post('settings/sms', [SettingController::class, 'updateSms']);
 
