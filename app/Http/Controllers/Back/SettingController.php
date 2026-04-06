@@ -261,7 +261,6 @@ class SettingController extends Controller
             'quick_links.*.sort_order' => 'nullable|integer|min:0',
 
             'footer_company_description' => 'nullable|string|max:2000',
-            'footer_company_image' => 'nullable|image|max:4096',
 
             'contact_address' => 'nullable|string|max:1000',
             'contact_phone' => 'nullable|string|max:64',
@@ -269,9 +268,6 @@ class SettingController extends Controller
             'contact_instagram' => 'nullable|url|max:255',
             'contact_telegram' => 'nullable|url|max:255',
             'contact_whatsapp' => 'nullable|url|max:255',
-            'contact_instagram_icon' => 'nullable|file|mimetypes:image/svg+xml|max:1024',
-            'contact_telegram_icon' => 'nullable|file|mimetypes:image/svg+xml|max:1024',
-            'contact_whatsapp_icon' => 'nullable|file|mimetypes:image/svg+xml|max:1024',
             'contact_trust_badge_url' => 'nullable|url|max:255',
             'contact_trust_badge_image' => 'nullable|image|max:2048',
         ]);
@@ -306,9 +302,6 @@ class SettingController extends Controller
             'instagram' => $validated['contact_instagram'] ?? '',
             'telegram' => $validated['contact_telegram'] ?? '',
             'whatsapp' => $validated['contact_whatsapp'] ?? '',
-            'instagram_icon' => option('footer_contact_instagram_icon', ''),
-            'telegram_icon' => option('footer_contact_telegram_icon', ''),
-            'whatsapp_icon' => option('footer_contact_whatsapp_icon', ''),
 
             'show_instagram' => (bool) $request->input('contact_show_instagram', false),
             'show_telegram' => (bool) $request->input('contact_show_telegram', false),
@@ -318,54 +311,6 @@ class SettingController extends Controller
             'trust_badge_url' => $validated['contact_trust_badge_url'] ?? '',
             'trust_badge_image' => option('footer_trust_badge_image', ''),
         ];
-
-        $company_image = option('footer_company_image', '');
-        if ($request->hasFile('footer_company_image')) {
-            if ($company_image) {
-                Storage::disk('public')->delete($company_image);
-            }
-
-            $imageName = time() . '_footer_company.' . $request->footer_company_image->getClientOriginalExtension();
-            $request->footer_company_image->move(public_path('uploads/'), $imageName);
-            $company_image = '/uploads/' . $imageName;
-        }
-
-        if ($request->boolean('footer_company_image_remove')) {
-            if ($company_image) {
-                Storage::disk('public')->delete($company_image);
-            }
-            $company_image = '';
-        }
-
-        $socialIcons = [
-            'instagram' => 'contact_instagram_icon',
-            'telegram' => 'contact_telegram_icon',
-            'whatsapp' => 'contact_whatsapp_icon',
-        ];
-
-        foreach ($socialIcons as $key => $inputName) {
-            $iconOptionKey = 'footer_contact_' . $key . '_icon';
-
-            if ($request->hasFile($inputName)) {
-                if (!empty($contact_data[$key . '_icon'])) {
-                    Storage::disk('public')->delete($contact_data[$key . '_icon']);
-                }
-
-                $fileName = time() . '_footer_' . $key . '_icon.' . $request->file($inputName)->getClientOriginalExtension();
-                $request->file($inputName)->move(public_path('uploads/'), $fileName);
-                $contact_data[$key . '_icon'] = '/uploads/' . $fileName;
-                option_update($iconOptionKey, $contact_data[$key . '_icon']);
-            }
-
-            if ($request->boolean('contact_' . $key . '_icon_remove')) {
-                if (!empty($contact_data[$key . '_icon'])) {
-                    Storage::disk('public')->delete($contact_data[$key . '_icon']);
-                }
-
-                $contact_data[$key . '_icon'] = '';
-                option_update($iconOptionKey, '');
-            }
-        }
 
         if ($request->hasFile('contact_trust_badge_image')) {
             $imageName = time() . '_footer_trust_badge.' . $request->contact_trust_badge_image->getClientOriginalExtension();
@@ -377,8 +322,6 @@ class SettingController extends Controller
         option_update('footer_sections', json_encode($sections, JSON_UNESCAPED_UNICODE));
         option_update('footer_quick_links', json_encode($quick_links, JSON_UNESCAPED_UNICODE));
         option_update('footer_company_description', $validated['footer_company_description'] ?? '');
-        option_update('footer_company_show_image', $request->boolean('footer_company_show_image', false) ? '1' : '0');
-        option_update('footer_company_image', $company_image);
         option_update('footer_contact_data', json_encode($contact_data, JSON_UNESCAPED_UNICODE));
 
         return response('success');
@@ -391,11 +334,6 @@ class SettingController extends Controller
         option_update('footer_sections', json_encode($footerBuilderService->defaultSections(), JSON_UNESCAPED_UNICODE));
         option_update('footer_quick_links', json_encode($footerBuilderService->defaultQuickLinks(), JSON_UNESCAPED_UNICODE));
         option_update('footer_company_description', option('info_short_description'));
-        option_update('footer_company_show_image', '0');
-        option_update('footer_company_image', '');
-        option_update('footer_contact_instagram_icon', '');
-        option_update('footer_contact_telegram_icon', '');
-        option_update('footer_contact_whatsapp_icon', '');
         option_update('footer_contact_data', json_encode($footerBuilderService->defaultContactData(), JSON_UNESCAPED_UNICODE));
 
         return response('success');
