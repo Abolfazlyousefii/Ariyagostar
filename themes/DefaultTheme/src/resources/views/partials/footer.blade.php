@@ -27,7 +27,6 @@
             <span>{{ trans('front::messages.index.back-to-top') }}</span>
         </a>
     </div>
-
     <div class="container main-container">
         <div class="footer-pro__wrapper">
             <div class="row">
@@ -66,20 +65,13 @@
                                 </li>
                             @endif
 
-                            @if(option('info_tel'))
-                                <li>
-                                    <i class="mdi mdi-phone-outline"></i>
-                                    <a href="tel:{{ option('info_tel') }}">{{ option('info_tel') }}</a>
-                                </li>
-                            @endif
+                        @if(option('info_enamad'))
+                            {!! option('info_enamad') !!}
+                        @endif
 
-                            @if(option('info_email'))
-                                <li>
-                                    <i class="mdi mdi-email-outline"></i>
-                                    <a href="mailto:{{ option('info_email') }}">{{ option('info_email') }}</a>
-                                </li>
-                            @endif
-                        </ul>
+                        @if(option('info_samandehi'))
+                            {!! option('info_samandehi') !!}
+                        @endif
 
                         <div class="footer-pro__socials" aria-label="شبکه‌های اجتماعی">
                             @if(option('social_instagram'))
@@ -88,18 +80,13 @@
                                 </a>
                             @endif
 
-                            @if(option('social_telegram'))
-                                <a href="{{ option('social_telegram') }}" target="_blank" rel="noopener" aria-label="تلگرام">
-                                    <i class="mdi mdi-telegram"></i>
-                                </a>
-                            @endif
+                                @if(option('social_whatsapp'))
+                                    <li><a href="{{ option('social_whatsapp') }}"><i class="mdi mdi-whatsapp"></i></a></li>
+                                @endif
 
-                            @if(option('social_whatsapp'))
-                                <a href="{{ option('social_whatsapp') }}" target="_blank" rel="noopener" aria-label="واتساپ">
-                                    <i class="mdi mdi-whatsapp"></i>
-                                </a>
-                            @endif
-                        </div>
+                                @if(option('social_telegram'))
+                                    <li><a href="{{ option('social_telegram') }}"><i class="mdi mdi-telegram"></i></a></li>
+                                @endif
 
                         @if(option('info_enamad') || option('info_samandehi'))
                             <div class="footer-pro__trusts" aria-label="نماد اعتماد الکترونیکی">
@@ -109,17 +96,17 @@
                                 @if(option('info_samandehi'))
                                     <div class="footer-pro__trust-item">{!! option('info_samandehi') !!}</div>
                                 @endif
-                            </div>
-                        @endif
-                    </section>
+
+                            </ul>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
 
     <div class="copyright footer-pro__copyright">
         <div class="container main-container">
-            <p class="text-center mb-0">{{ option('info_footer_text') }}</p>
+            <p class="text-center">{{ option('info_footer_text') }}</p>
         </div>
     </div>
 </footer>
