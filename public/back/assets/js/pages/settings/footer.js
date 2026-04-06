@@ -175,6 +175,11 @@ $(document).ready(function () {
 
     bindMoveAndRemove();
 
+    $(document).on('change', '.custom-file-input', function () {
+        const fileName = this.files && this.files.length ? this.files[0].name : 'انتخاب فایل';
+        $(this).next('.custom-file-label').text(fileName);
+    });
+
     (window.footerInitialData.sections || []).forEach(function (section) {
         addSectionRow(section);
     });

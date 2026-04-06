@@ -43,6 +43,11 @@
                                     <h3 class="card-title">{{ $section['title'] }}</h3>
                                 </header>
                                 <div class="card-body pt-2">
+                                    @if(option('footer_company_show_image', '0') === '1' && option('footer_company_image'))
+                                        <div class="mb-2 text-center">
+                                            <img src="{{ asset(option('footer_company_image')) }}" alt="{{ $section['title'] }}" class="img-fluid rounded" style="max-height: 120px; object-fit: cover;">
+                                        </div>
+                                    @endif
                                     <p class="mb-0 text-muted">{{ $companyDescription }}</p>
                                 </div>
                             </div>
@@ -70,13 +75,37 @@
                                     <div class="footer-social">
                                         <ul class="text-center">
                                             @if(!empty($contactData['show_instagram']) && !empty($contactData['instagram']))
-                                                <li><a href="{{ $contactData['instagram'] }}" aria-label="instagram"><i class="mdi mdi-instagram"></i></a></li>
+                                                <li>
+                                                    <a href="{{ $contactData['instagram'] }}" aria-label="instagram">
+                                                        @if(!empty($contactData['instagram_icon']))
+                                                            <img src="{{ asset($contactData['instagram_icon']) }}" alt="instagram" style="width: 20px; height: 20px; object-fit: contain;">
+                                                        @else
+                                                            <i class="mdi mdi-instagram"></i>
+                                                        @endif
+                                                    </a>
+                                                </li>
                                             @endif
                                             @if(!empty($contactData['show_whatsapp']) && !empty($contactData['whatsapp']))
-                                                <li><a href="{{ $contactData['whatsapp'] }}" aria-label="whatsapp"><i class="mdi mdi-whatsapp"></i></a></li>
+                                                <li>
+                                                    <a href="{{ $contactData['whatsapp'] }}" aria-label="whatsapp">
+                                                        @if(!empty($contactData['whatsapp_icon']))
+                                                            <img src="{{ asset($contactData['whatsapp_icon']) }}" alt="whatsapp" style="width: 20px; height: 20px; object-fit: contain;">
+                                                        @else
+                                                            <i class="mdi mdi-whatsapp"></i>
+                                                        @endif
+                                                    </a>
+                                                </li>
                                             @endif
                                             @if(!empty($contactData['show_telegram']) && !empty($contactData['telegram']))
-                                                <li><a href="{{ $contactData['telegram'] }}" aria-label="telegram"><i class="mdi mdi-telegram"></i></a></li>
+                                                <li>
+                                                    <a href="{{ $contactData['telegram'] }}" aria-label="telegram">
+                                                        @if(!empty($contactData['telegram_icon']))
+                                                            <img src="{{ asset($contactData['telegram_icon']) }}" alt="telegram" style="width: 20px; height: 20px; object-fit: contain;">
+                                                        @else
+                                                            <i class="mdi mdi-telegram"></i>
+                                                        @endif
+                                                    </a>
+                                                </li>
                                             @endif
                                         </ul>
                                     </div>
