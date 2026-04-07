@@ -117,13 +117,6 @@
                             </li>
                         @endcan
 
-
-                        @can('products.create')
-                            <li class="{{ active_class('admin.products.import.*') }}">
-                                <a href="{{ route('admin.products.import.index') }}"><i class="feather icon-circle"></i><span class="menu-item">ایمپورت محصولات</span></a>
-                            </li>
-                        @endcan
-
                         @can('products.brands')
                             <li class="{{ open_class(['admin.brands.*']) }}">
                                 <a href="#"><i class="feather icon-circle"></i><span class="menu-item"> برندها</span></a>
