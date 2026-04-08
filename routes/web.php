@@ -32,6 +32,7 @@ use App\Http\Controllers\Back\InstallController;
 use App\Http\Controllers\Back\RoleController;
 use App\Http\Controllers\Back\PermissionController;
 use App\Http\Controllers\Back\PriceController;
+use App\Http\Controllers\Back\ProductImportController;
 use App\Http\Controllers\Back\ReviewController;
 use App\Http\Controllers\Back\SettingController;
 use App\Http\Controllers\Back\SizeTypeController;
@@ -119,6 +120,9 @@ Route::group(['as' => 'admin.', 'prefix' => 'admin/' . admin_route_prefix(), 'mi
     Route::get('product/torobPrices', [ProductController::class, 'torobPrices'])->name('product.torobPrices');
     Route::get('product/torobImport', [ProductController::class, 'torobImport'])->name('product.torobImport');
     Route::post('product/torobUpload', [ProductController::class, 'torobUpload'])->name('product.torobUpload');
+    Route::get('products/import', [ProductImportController::class, 'index'])->name('products.import.index');
+    Route::post('products/import', [ProductImportController::class, 'store'])->name('products.import.store');
+    Route::get('products/import/sample', [ProductImportController::class, 'sample'])->name('products.import.sample');
     Route::get('product/prices', [ProductController::class, 'indexPrices'])->name('product.prices.index');
     Route::put('product/prices', [ProductController::class, 'updatePrices'])->name('product.prices.update');
 

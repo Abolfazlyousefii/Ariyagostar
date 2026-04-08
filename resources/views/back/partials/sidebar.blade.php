@@ -75,6 +75,12 @@
                             </li>
                         @endcan
 
+                        @can('products.create')
+                            <li class="{{ active_class('admin.products.import.*') }}">
+                                <a href="{{ route('admin.products.import.index') }}"><i class="feather icon-circle"></i><span class="menu-item">ایمپورت محصولات</span></a>
+                            </li>
+                        @endcan
+
                         @can('products.category')
                             <li class="{{ active_class('admin.products.categories.index') }}">
                                 <a href="{{ route('admin.products.categories.index') }}"><i class="feather icon-circle"></i><span class="menu-item">دسته بندی ها</span></a>
