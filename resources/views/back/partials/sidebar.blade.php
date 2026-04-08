@@ -61,7 +61,7 @@
             @endcan
 
             @can('products')
-                <li class="nav-item has-sub {{ open_class(['admin.products.*', 'admin.brands.*', 'admin.sizetypes.*']) }}"><a href="#"><i class="feather icon-shopping-cart"></i><span class="menu-title" > محصولات</span></a>
+                <li class="nav-item has-sub {{ open_class(['admin.products.*', 'admin.brands.*', 'admin.sizetypes.*', 'admin.products.import.*']) }}"><a href="#"><i class="feather icon-shopping-cart"></i><span class="menu-title" > محصولات</span></a>
                     <ul class="menu-content">
                         @can('products.index')
                             <li class="{{ active_class('admin.products.index') }}">
@@ -114,6 +114,12 @@
                         @can('products.prices')
                             <li class="{{ active_class('admin.product.torobPrices') }}">
                                 <a href="{{ route('admin.product.torobPrices') }}"><i class="feather icon-circle"></i><span class="menu-item">مقایسه قیمت ترب</span></a>
+                            </li>
+                        @endcan
+
+                        @can('products.create')
+                            <li class="{{ active_class('admin.products.import.index') }}">
+                                <a href="{{ route('admin.products.import.index') }}"><i class="feather icon-circle"></i><span class="menu-item">ایمپورت اکسل محصولات</span></a>
                             </li>
                         @endcan
 
