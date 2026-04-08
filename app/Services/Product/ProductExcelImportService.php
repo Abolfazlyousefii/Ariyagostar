@@ -131,7 +131,7 @@ class ProductExcelImportService
                     'price_type' => 'multiple-price',
                     'external_product_id' => $externalId,
                     'lang' => app()->getLocale(),
-                    'published' => false,
+                    'published' => true,
                     'admin_updated_at' => now(),
                     'weight' => 0,
                     'unit' => 'تعداد',
@@ -180,17 +180,28 @@ class ProductExcelImportService
         }
 
         $names = preg_split('/[,|;\r\n]+/', $categoriesRaw) ?: [];
-        $names = collect($names)
-            ->map(fn ($name) => trim($name))
-            ->filter()
+        $names = collect($names)->map(fn ($name) => trim($name))->filter()->values();
+
+        $normalizedMainCategories = [];
+
+        foreach ($names as $name) {
+            $normalized = $this->normalizeMainCategoryName($name);
+
+            if ($normalized) {
+                $normalizedMainCategories[] = $normalized;
+            }
+        }
+
+        $names = collect($normalizedMainCategories)
             ->unique(fn ($name) => Str::lower($name))
             ->values();
 
         $categoryIds = [];
 
         foreach ($names as $name) {
-            $existing = Category::detectLang()
+            $existing = Category::query()
                 ->where('type', 'productcat')
+                ->whereNull('category_id')
                 ->whereRaw('LOWER(title) = ?', [Str::lower($name)])
                 ->first();
 
@@ -208,5 +219,24 @@ class ProductExcelImportService
         }
 
         return array_values(array_unique($categoryIds));
+    }
+
+    private function normalizeMainCategoryName(string $rawCategory): ?string
+    {
+        $category = Str::lower(trim($rawCategory));
+
+        if ($category === '') {
+            return null;
+        }
+
+        if (Str::contains($category, ['guard', 'case', 'cover', 'گارد', 'کاور'])) {
+            return 'Guard';
+        }
+
+        if (Str::contains($category, ['mobile', 'phone', 'smartphone', 'موبایل', 'گوشی'])) {
+            return 'Mobile';
+        }
+
+        return null;
     }
 }

@@ -28,7 +28,13 @@ class ProductController extends Controller
             ->orderBy('ordering')
             ->get();
 
-        return view('front::products.index', compact('categories'));
+        $products = Product::detectLang()
+            ->published()
+            ->orderByStock()
+            ->latest()
+            ->paginate(20);
+
+        return view('front::products.index', compact('categories', 'products'));
     }
 
     public function category(Category $category)
