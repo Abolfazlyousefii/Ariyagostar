@@ -40,7 +40,7 @@
                                         <fieldset class="form-group">
                                             <label for="excel_file">فایل اکسل / CSV</label>
                                             <div class="custom-file">
-                                                <input id="excel_file" type="file" name="excel_file" class="custom-file-input @error('excel_file') is-invalid @enderror" accept=".xlsx,.xls,.csv,.txt">
+                                                <input id="excel_file" type="file" name="excel_file" class="custom-file-input @error('excel_file') is-invalid @enderror" accept=".xlsx,.xls,.csv">
                                                 <label class="custom-file-label" for="excel_file">انتخاب فایل</label>
                                             </div>
                                             @error('excel_file')

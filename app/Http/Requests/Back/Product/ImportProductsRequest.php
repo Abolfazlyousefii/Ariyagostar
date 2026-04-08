@@ -14,7 +14,7 @@ class ImportProductsRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'excel_file' => 'required|file|mimes:xlsx,xls,csv,txt|max:10240',
+            'excel_file' => 'required|file|mimes:xlsx,xls,csv|max:10240',
         ];
     }
 

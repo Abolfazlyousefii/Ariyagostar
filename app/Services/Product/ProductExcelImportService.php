@@ -7,6 +7,8 @@ use App\Models\Product;
 use Cviebrock\EloquentSluggable\Services\SlugService;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use Maatwebsite\Excel\Facades\Excel;
 use Throwable;
@@ -29,7 +31,32 @@ class ProductExcelImportService
             Config::set('excel.imports.csv.input_encoding', 'UTF-8');
         }
 
-        $rows = Excel::toArray(null, $file);
+        if (!Schema::hasColumn('products', 'external_product_id')) {
+            $summary['failed'] = 1;
+            $summary['failures'][] = [
+                'row' => 0,
+                'reason' => 'ستون external_product_id در جدول محصولات وجود ندارد. لطفا migrate را اجرا کنید.',
+            ];
+
+            return $summary;
+        }
+
+        try {
+            $rows = Excel::toArray(null, $file);
+        } catch (Throwable $exception) {
+            Log::error('Product Excel file parsing failed', [
+                'message' => $exception->getMessage(),
+            ]);
+
+            $summary['failed'] = 1;
+            $summary['failures'][] = [
+                'row' => 0,
+                'reason' => 'فایل قابل خواندن نیست یا فرمت آن معتبر نیست.',
+            ];
+
+            return $summary;
+        }
+
         $sheetRows = $rows[0] ?? [];
 
         if (empty($sheetRows)) {
@@ -43,7 +70,7 @@ class ProductExcelImportService
         }
 
         $headers = collect($sheetRows[0])
-            ->map(fn ($header) => Str::lower(trim((string) $header)))
+            ->map(fn ($header) => Str::lower(trim(str_replace("\u{FEFF}", '', (string) $header))))
             ->toArray();
 
         $headerIndexes = [
@@ -92,17 +119,24 @@ class ProductExcelImportService
             }
 
             try {
+                $externalId = Str::limit($externalId, 190, '');
+                $productName = Str::limit($productName, 191, '');
+
                 $product = Product::where('external_product_id', $externalId)->first();
 
                 $data = [
                     'title' => $productName,
-                    'slug' => $product?->slug ?: SlugService::createSlug(Product::class, 'slug', $productName . '-' . $externalId),
+                    'slug' => $product?->slug ?: SlugService::createSlug(Product::class, 'slug', Str::limit($productName, 120, '') . '-' . $externalId),
                     'type' => 'physical',
                     'price_type' => 'multiple-price',
                     'external_product_id' => $externalId,
                     'lang' => app()->getLocale(),
                     'published' => false,
                     'admin_updated_at' => now(),
+                    'weight' => 0,
+                    'unit' => 'تعداد',
+                    'rounding_type' => 'default',
+                    'rounding_amount' => 'default',
                 ];
 
                 if ($product) {
@@ -123,6 +157,11 @@ class ProductExcelImportService
                     }
                 }
             } catch (Throwable $exception) {
+                Log::warning('Product import row failed', [
+                    'row' => $excelRowNumber,
+                    'message' => $exception->getMessage(),
+                ]);
+
                 $summary['failed']++;
                 $summary['failures'][] = [
                     'row' => $excelRowNumber,
@@ -140,7 +179,7 @@ class ProductExcelImportService
             return [];
         }
 
-        $names = preg_split('/[,|;]+/', $categoriesRaw) ?: [];
+        $names = preg_split('/[,|;\r\n]+/', $categoriesRaw) ?: [];
         $names = collect($names)
             ->map(fn ($name) => trim($name))
             ->filter()

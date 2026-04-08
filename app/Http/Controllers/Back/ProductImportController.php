@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Back\Product\ImportProductsRequest;
 use App\Services\Product\ProductExcelImportService;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Log;
+use Throwable;
 
 class ProductImportController extends Controller
 {
@@ -20,7 +22,27 @@ class ProductImportController extends Controller
     {
         $this->authorize('products.create');
 
-        $summary = $importService->import($request->file('excel_file'));
+        try {
+            $summary = $importService->import($request->file('excel_file'));
+        } catch (Throwable $exception) {
+            Log::error('Product Excel import crashed', [
+                'message' => $exception->getMessage(),
+            ]);
+
+            $summary = [
+                'total_rows' => 0,
+                'imported' => 0,
+                'updated' => 0,
+                'skipped' => 0,
+                'failed' => 1,
+                'failures' => [
+                    [
+                        'row' => 0,
+                        'reason' => 'خطای سیستمی هنگام پردازش فایل رخ داد. لاگ سرور را بررسی کنید.',
+                    ],
+                ],
+            ];
+        }
 
         if ($summary['failed'] > 0) {
             toastr()->warning('ایمپورت با خطاهای جزئی انجام شد. گزارش را بررسی کنید.');
