@@ -60,7 +60,21 @@
                             </div>
 
                         </div>
-                    @else
+                    @endif
+
+                    @if($products->count())
+                        <div class="dt-sl dt-sn px-0 search-amazing-tab mt-3">
+                            <div class="row mb-3 mx-0 px-res-0">
+                                @foreach($products as $product)
+                                    <div class="col-lg-3 col-md-4 col-sm-6 col-12 px-10 mb-1 px-res-0 category-product-div">
+                                        @include('front::products.partials.product-card', ['product' => $product])
+                                    </div>
+                                @endforeach
+                            </div>
+
+                            {{ $products->appends(request()->all())->links('front::components.paginate') }}
+                        </div>
+                    @elseif(!$categories->count())
                         @include('front::partials.empty')
                     @endif
                 </div>
