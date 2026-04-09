@@ -50,6 +50,7 @@ $(document).ready(function() {
 
         $('#selected-count').text(selectedIds.length + ' مورد انتخاب شده');
         $('#bulk-delete-trigger').prop('disabled', selectedIds.length === 0);
+        $('#bulk-delete-trigger').toggle(selectedIds.length > 0);
 
         if (allCount > 0 && selectedIds.length === allCount) {
             $('#select-all-categories').prop('checked', true);
@@ -131,6 +132,7 @@ $(document).ready(function() {
     });
 
     $(document).on('click', '#confirm-bulk-delete', function() {
+        var submitBtn = $(this);
         var selectedIds = getSelectedCategoryIds();
 
         if (!selectedIds.length) {
@@ -153,6 +155,9 @@ $(document).ready(function() {
                 $('#modal-bulk-delete').modal('hide');
                 if (typeof toastr !== 'undefined') {
                     toastr.success(response.message);
+                    if (response.blocked && response.blocked.length) {
+                        toastr.warning('این دسته‌بندی‌ها حذف نشدند: ' + response.blocked.join('، '));
+                    }
                 }
                 window.location.reload();
             },
@@ -167,10 +172,12 @@ $(document).ready(function() {
             },
             beforeSend: function(xhr) {
                 block('#main-block');
+                submitBtn.prop('disabled', true);
                 xhr.setRequestHeader('X-CSRF-TOKEN', $('meta[name="csrf-token"]').attr('content'));
             },
             complete: function() {
                 unblock('#main-block');
+                submitBtn.prop('disabled', false);
             },
         });
     });

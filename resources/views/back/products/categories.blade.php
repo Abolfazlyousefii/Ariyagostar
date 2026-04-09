@@ -123,7 +123,8 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <p class="mb-0">دسته‌بندی‌های انتخاب‌شده حذف می‌شوند. اگر هر دسته یا زیر‌دسته به محصولی متصل باشد حذف نخواهد شد.</p>
+                    <p class="mb-50">دسته‌بندی‌های انتخاب‌شده حذف می‌شوند. اگر هر دسته یا زیر‌دسته به محصولی متصل باشد حذف نخواهد شد.</p>
+                    <p class="mb-0 text-danger">این عملیات غیرقابل بازگشت است.</p>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-success waves-effect waves-light" data-dismiss="modal">انصراف</button>

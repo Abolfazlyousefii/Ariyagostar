@@ -143,9 +143,10 @@ class CategoryController extends Controller
         });
 
         $deletedTitles = [];
+        $deletedCount = 0;
         $blocked = [];
 
-        DB::transaction(function () use ($rootCandidates, $childrenByParent, &$deletedTitles, &$blocked) {
+        DB::transaction(function () use ($rootCandidates, $childrenByParent, &$deletedTitles, &$deletedCount, &$blocked) {
             foreach ($rootCandidates as $category) {
                 $treeIds = $this->collectCategoryTreeIds($category->id, $childrenByParent);
 
@@ -159,17 +160,20 @@ class CategoryController extends Controller
 
                 $this->deleteCategoryTree($category, $treeIds);
                 $deletedTitles[] = $category->title;
+                $deletedCount += count($treeIds);
             }
         });
 
-        if (empty($deletedTitles) && !empty($blocked)) {
+        $blocked = array_values(array_unique($blocked));
+
+        if ($deletedCount === 0 && !empty($blocked)) {
             return response()->json([
                 'message' => 'هیچ دسته‌بندی حذف نشد. برخی دسته‌بندی‌های انتخابی به محصولات متصل هستند.',
                 'blocked' => $blocked,
             ], 422);
         }
 
-        $message = sprintf('حذف گروهی انجام شد. %s دسته‌بندی حذف شد.', count($deletedTitles));
+        $message = sprintf('حذف گروهی انجام شد. %s دسته‌بندی حذف شد.', $deletedCount);
 
         if (!empty($blocked)) {
             $message .= ' برخی دسته‌بندی‌ها به دلیل ارتباط با محصولات حذف نشدند.';
@@ -178,6 +182,7 @@ class CategoryController extends Controller
         return response()->json([
             'message' => $message,
             'deleted' => $deletedTitles,
+            'deleted_count' => $deletedCount,
             'blocked' => $blocked,
         ]);
     }
