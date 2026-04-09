@@ -7,6 +7,7 @@ use App\Models\Product;
 use Cviebrock\EloquentSluggable\Services\SlugService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
@@ -24,6 +25,7 @@ class CleanupImportedProductCategories extends Command
             'kept' => [],
             'removed' => [],
             'reassigned' => 0,
+            'deleted_imported_products' => 0,
             'published_imported_products' => 0,
         ];
 
@@ -118,12 +120,29 @@ class CleanupImportedProductCategories extends Command
                     'category_id' => $mainCategories['mobile']->id,
                 ]);
 
+            $importedProducts = Product::query()
+                ->whereNotNull('external_product_id')
+                ->withCount(['prices', 'orders', 'categories'])
+                ->get();
+
+            foreach ($importedProducts as $product) {
+                if (!$this->shouldDeleteImportedProduct($product)) {
+                    continue;
+                }
+
+                $product->categories()->detach();
+                $product->delete();
+                $summary['deleted_imported_products']++;
+            }
+
             $summary['published_imported_products'] += Product::query()
                 ->whereNotNull('external_product_id')
                 ->where('published', false)
                 ->update([
                     'published' => true,
                 ]);
+
+            Cache::forget('front.productcats');
         };
 
         if ($dryRun) {
@@ -137,6 +156,7 @@ class CleanupImportedProductCategories extends Command
         $this->info('Kept categories: ' . implode(', ', $summary['kept']));
         $this->info('Removed categories: ' . (count($summary['removed']) ? implode(', ', $summary['removed']) : 'none'));
         $this->info('Products reassigned: ' . $summary['reassigned']);
+        $this->info('Imported products deleted: ' . $summary['deleted_imported_products']);
         $this->info('Imported products published: ' . $summary['published_imported_products']);
 
         if ($dryRun) {
@@ -159,5 +179,26 @@ class CleanupImportedProductCategories extends Command
         }
 
         return $mainCategories['mobile'];
+    }
+
+    private function shouldDeleteImportedProduct(Product $product): bool
+    {
+        $title = Str::lower(trim((string) $product->title));
+
+        if ($title === '') {
+            return true;
+        }
+
+        if (Str::startsWith($title, 'sample product')) {
+            return true;
+        }
+
+        $hasNoCommercialData = (int) $product->prices_count === 0
+            && (int) $product->orders_count === 0
+            && blank($product->image);
+
+        $hasNoEffectiveCategory = (int) $product->categories_count === 0 && !$product->category_id;
+
+        return $hasNoCommercialData && $hasNoEffectiveCategory;
     }
 }
