@@ -5,9 +5,7 @@
                 <a href="{{ route('front.products.index') }}">{{ $menu->title }}</a>
                 <ul>
                     @foreach($productcats as $category)
-                        <li>
-                            <a href="{{ $category->link }}">{{ $category->title }}</a>
-                        </li>
+                        @include('front::partials.mobile-menu.child-category')
                     @endforeach
                 </ul>
             </li>
@@ -30,3 +28,4 @@
         @break
 
 @endswitch
+
