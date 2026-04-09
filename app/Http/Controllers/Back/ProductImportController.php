@@ -55,6 +55,28 @@ class ProductImportController extends Controller
             ->with('import_summary', $summary);
     }
 
+    public function cleanup(ProductExcelImportService $importService)
+    {
+        $this->authorize('products.delete');
+
+        try {
+            $summary = $importService->cleanupImportedData();
+            toastr()->success('پاکسازی داده‌های ایمپورت با موفقیت انجام شد.');
+        } catch (Throwable $exception) {
+            Log::error('Product import cleanup crashed', [
+                'message' => $exception->getMessage(),
+            ]);
+
+            toastr()->error('عملیات پاکسازی انجام نشد. لاگ سرور را بررسی کنید.');
+
+            return redirect()->route('admin.products.import.index');
+        }
+
+        return redirect()
+            ->route('admin.products.import.index')
+            ->with('cleanup_summary', $summary);
+    }
+
     public function sample(): Response
     {
         $this->authorize('products.create');
