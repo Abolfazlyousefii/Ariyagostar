@@ -123,11 +123,7 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <p class="mb-1">
-                        شما در حال حذف <strong id="bulk-delete-count">0</strong> دسته‌بندی هستید.
-                    </p>
-                    <p class="mb-1 text-danger">این عملیات غیرقابل بازگشت است.</p>
-                    <p class="mb-0">اگر هر دسته یا زیر‌دسته به محصولی متصل باشد حذف نخواهد شد و نتیجه به شما گزارش می‌شود.</p>
+                    <p class="mb-0">دسته‌بندی‌های انتخاب‌شده حذف می‌شوند. اگر هر دسته یا زیر‌دسته به محصولی متصل باشد حذف نخواهد شد.</p>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-success waves-effect waves-light" data-dismiss="modal">انصراف</button>

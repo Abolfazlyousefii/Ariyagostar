@@ -127,13 +127,11 @@ $(document).ready(function() {
             return;
         }
 
-        $('#bulk-delete-count').text(selectedIds.length);
         $('#modal-bulk-delete').modal('show');
     });
 
     $(document).on('click', '#confirm-bulk-delete', function() {
         var selectedIds = getSelectedCategoryIds();
-        var $confirmBtn = $(this);
 
         if (!selectedIds.length) {
             $('#modal-bulk-delete').modal('hide');
@@ -154,11 +152,7 @@ $(document).ready(function() {
             success: function(response) {
                 $('#modal-bulk-delete').modal('hide');
                 if (typeof toastr !== 'undefined') {
-                    if (response.blocked_count && response.blocked_count > 0) {
-                        toastr.warning(response.message);
-                    } else {
-                        toastr.success(response.message);
-                    }
+                    toastr.success(response.message);
                 }
                 window.location.reload();
             },
@@ -167,24 +161,16 @@ $(document).ready(function() {
                 if (xhr.responseJSON && xhr.responseJSON.message) {
                     message = xhr.responseJSON.message;
                 }
-                if (xhr.responseJSON && xhr.responseJSON.blocked && xhr.responseJSON.blocked.length) {
-                    var blockedTitles = xhr.responseJSON.blocked.map(function(item) {
-                        return item.title + (item.reason ? ' (' + item.reason + ')' : '');
-                    }).join('، ');
-                    message += ' ' + blockedTitles;
-                }
                 if (typeof toastr !== 'undefined') {
                     toastr.error(message);
                 }
             },
             beforeSend: function(xhr) {
                 block('#main-block');
-                $confirmBtn.prop('disabled', true);
                 xhr.setRequestHeader('X-CSRF-TOKEN', $('meta[name="csrf-token"]').attr('content'));
             },
             complete: function() {
                 unblock('#main-block');
-                $confirmBtn.prop('disabled', false);
             },
         });
     });
