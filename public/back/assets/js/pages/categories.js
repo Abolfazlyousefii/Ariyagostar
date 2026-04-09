@@ -40,6 +40,17 @@ $(document).ready(function() {
         }
     }
 
+
+    function isDeleteAllConfirmationValid(value) {
+        var normalized = $.trim(value || '');
+        return normalized.toUpperCase() === 'DELETE' || normalized === 'حذف همه';
+    }
+
+    function updateDeleteAllConfirmState() {
+        var value = $('#delete-all-confirmation').val();
+        $('#confirm-delete-all').prop('disabled', !isDeleteAllConfirmationValid(value));
+    }
+
     function updateBulkActionsState() {
         if (!hasBulkDelete) {
             return;
@@ -158,6 +169,64 @@ $(document).ready(function() {
             },
             error: function(xhr) {
                 var message = 'حذف گروهی انجام نشد.';
+                if (xhr.responseJSON && xhr.responseJSON.message) {
+                    message = xhr.responseJSON.message;
+                }
+                if (typeof toastr !== 'undefined') {
+                    toastr.error(message);
+                }
+            },
+            beforeSend: function(xhr) {
+                block('#main-block');
+                xhr.setRequestHeader('X-CSRF-TOKEN', $('meta[name="csrf-token"]').attr('content'));
+            },
+            complete: function() {
+                unblock('#main-block');
+            },
+        });
+    });
+
+
+    $('#modal-delete-all').on('show.bs.modal', function() {
+        $('#delete-all-confirmation').val('');
+        $('#confirm-delete-all').prop('disabled', true);
+    });
+
+    $('#modal-delete-all').on('shown.bs.modal', function() {
+        $('#delete-all-confirmation').focus();
+    });
+
+    $(document).on('input', '#delete-all-confirmation', function() {
+        updateDeleteAllConfirmState();
+    });
+
+    $(document).on('click', '#confirm-delete-all', function() {
+        var confirmation = $.trim($('#delete-all-confirmation').val());
+
+        if (!isDeleteAllConfirmationValid(confirmation)) {
+            if (typeof toastr !== 'undefined') {
+                toastr.warning('برای حذف همه باید عبارت DELETE یا حذف همه را وارد کنید.');
+            }
+            return;
+        }
+
+        $.ajax({
+            url: deleteAllRoute,
+            type: 'post',
+            data: {
+                _method: 'DELETE',
+                type: $('input[name="type"]').first().val(),
+                confirmation: confirmation,
+            },
+            success: function(response) {
+                $('#modal-delete-all').modal('hide');
+                if (typeof toastr !== 'undefined') {
+                    toastr.success(response.message);
+                }
+                window.location.reload();
+            },
+            error: function(xhr) {
+                var message = 'حذف همه دسته‌بندی‌ها انجام نشد.';
                 if (xhr.responseJSON && xhr.responseJSON.message) {
                     message = xhr.responseJSON.message;
                 }

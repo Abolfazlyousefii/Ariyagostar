@@ -67,6 +67,10 @@
                                             <i class="fa fa-trash ml-50"></i>
                                             حذف گروهی
                                         </button>
+                                        <button type="button" id="delete-all-trigger" class="btn btn-outline-danger waves-effect waves-light mr-1" data-toggle="modal" data-target="#modal-delete-all">
+                                            <i class="fa fa-exclamation-triangle ml-50"></i>
+                                            حذف همه دسته‌بندی‌ها
+                                        </button>
                                     </div>
                                 </div>
 
@@ -133,6 +137,32 @@
         </div>
     </div>
 
+
+    <div class="modal fade text-left" id="modal-delete-all" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" role="document" style="max-width: 520px;">
+            <div class="modal-content">
+                <div class="modal-header bg-danger">
+                    <h4 class="modal-title text-white">هشدار: حذف همه دسته‌بندی‌ها</h4>
+                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p class="text-danger font-weight-bold mb-1">این عملیات تمام دسته‌بندی‌های محصول و زیر‌دسته‌های آن‌ها را حذف می‌کند.</p>
+                    <p class="mb-1">ارتباطات دسته‌بندی با محصولات (اعم از دسته اصلی و دسته‌های چندتایی) به‌صورت امن پاک‌سازی می‌شود و relation یتیم باقی نمی‌ماند.</p>
+                    <p class="mb-2">دسته‌بندی‌های سیستمی/محافظت‌شده (مانند موبایل و گارد) حذف نمی‌شوند.</p>
+                    <label for="delete-all-confirmation" class="mb-50">برای تأیید، عبارت <strong>DELETE</strong> یا <strong>حذف همه</strong> را وارد کنید:</label>
+                    <input type="text" id="delete-all-confirmation" class="form-control" autocomplete="off" placeholder="DELETE">
+                    <small class="text-muted mt-50 d-block">تا زمان ورود عبارت صحیح، دکمه حذف غیرفعال است.</small>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success waves-effect waves-light" data-dismiss="modal">انصراف</button>
+                    <button type="button" id="confirm-delete-all" class="btn btn-danger waves-effect waves-light" disabled>بله، همه حذف شوند</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="modal fade text-left" id="modal-edit" tabindex="-1" role="dialog" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document" style="max-width: 900px; width: 90vw;">
             <div class="modal-content">
@@ -169,6 +199,7 @@
         var maxDepth = 10;
         var deleteRouteBase = '{{ route("admin.products.categories.destroy", "") }}';
         var bulkDeleteRoute = '{{ route("admin.products.categories.bulkDestroy") }}';
+        var deleteAllRoute = '{{ route("admin.products.categories.destroyAll") }}';
         var BASE_URL = '{{ url('/') }}';
         var adminRoutePrefix = '{{ admin_route_prefix() }}';
     </script>

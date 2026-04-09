@@ -182,6 +182,59 @@ class CategoryController extends Controller
         ]);
     }
 
+
+    public function destroyAll(Request $request)
+    {
+        $this->validate($request, [
+            'type' => 'required|string|in:productcat,postcat',
+            'confirmation' => 'required|string',
+        ]);
+
+        $this->authorizeCategory($request->type);
+
+        $confirmation = trim((string) $request->confirmation);
+        if (!in_array(mb_strtoupper($confirmation), ['DELETE', 'حذف همه'], true)) {
+            return response()->json([
+                'message' => 'عبارت تأیید نامعتبر است. برای حذف همه باید DELETE یا حذف همه را وارد کنید.',
+            ], 422);
+        }
+
+        $protectedIds = $this->getProtectedCategoryIds($request->type);
+
+        $deletableIds = Category::query()
+            ->where('type', $request->type)
+            ->when(!empty($protectedIds), function ($query) use ($protectedIds) {
+                $query->whereNotIn('id', $protectedIds);
+            })
+            ->pluck('id')
+            ->map(fn ($id) => (int) $id)
+            ->all();
+
+        if (empty($deletableIds)) {
+            return response()->json([
+                'message' => 'هیچ دسته‌بندی قابل حذفی وجود ندارد.',
+                'deleted_count' => 0,
+                'protected_count' => count($protectedIds),
+            ]);
+        }
+
+        DB::transaction(function () use ($deletableIds) {
+            $this->deleteCategoriesByIds($deletableIds);
+        });
+
+        $message = sprintf('حذف همه انجام شد. %s دسته‌بندی حذف شد.', count($deletableIds));
+
+        if (!empty($protectedIds)) {
+            $message .= sprintf(' %s دسته‌بندی سیستمی/محافظت‌شده حفظ شدند.', count($protectedIds));
+        }
+
+        return response()->json([
+            'message' => $message,
+            'deleted_count' => count($deletableIds),
+            'protected_count' => count($protectedIds),
+        ]);
+    }
+
     public function sort(Request $request)
     {
         $this->validate($request, [
@@ -243,9 +296,15 @@ class CategoryController extends Controller
     {
         $treeIds = $treeIds ?: $category->allChildCategories();
 
+        $this->deleteCategoriesByIds($treeIds);
+    }
+
+    private function deleteCategoriesByIds(array $categoryIds): void
+    {
         $categories = Category::query()
-            ->whereIn('id', $treeIds)
+            ->whereIn('id', $categoryIds)
             ->orderByRaw('category_id IS NULL ASC')
+            ->orderByDesc('category_id')
             ->get();
 
         foreach ($categories as $categoryItem) {
@@ -259,6 +318,23 @@ class CategoryController extends Controller
             $categoryItem->menus()->detach();
             $categoryItem->delete();
         }
+    }
+
+    private function getProtectedCategoryIds(string $type): array
+    {
+        if ($type !== 'productcat') {
+            return [];
+        }
+
+        return Category::query()
+            ->where('type', $type)
+            ->where(function ($query) {
+                $query->whereIn('slug', ['mobile', 'guard'])
+                    ->orWhereRaw('LOWER(title) IN (?, ?, ?, ?)', ['mobile', 'guard', 'موبایل', 'گارد']);
+            })
+            ->pluck('id')
+            ->map(fn ($id) => (int) $id)
+            ->all();
     }
 
     public function generate_slug(Request $request)
