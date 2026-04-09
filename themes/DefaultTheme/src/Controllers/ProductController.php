@@ -3,6 +3,7 @@
 namespace Themes\DefaultTheme\src\Controllers;
 
 use Carbon\Carbon;
+use App\Models\Brand;
 use App\Models\Price;
 use App\Models\Product;
 use App\Models\Category;
@@ -19,22 +20,129 @@ use Illuminate\Support\Facades\Storage;
 class ProductController extends Controller
 {
 
-    public function index()
+    public function index(Request $request)
     {
         $categories = Category::detectLang()
             ->published()
             ->whereNull('Category_id')
             ->where('type', 'productcat')
+            ->with(['childrenCategories' => function ($query) {
+                $query->published()->where('type', 'productcat')->orderBy('ordering');
+            }])
             ->orderBy('ordering')
             ->get();
 
-        $products = Product::detectLang()
+        $selectedCategory = null;
+        $subCategories = collect();
+
+        if ($request->filled('category_id')) {
+            $selectedCategory = Category::detectLang()
+                ->published()
+                ->where('type', 'productcat')
+                ->find($request->integer('category_id'));
+
+            if ($selectedCategory) {
+                $subCategories = $selectedCategory->childrenCategories;
+            }
+        }
+
+        $productsQuery = Product::detectLang()
             ->published()
             ->orderByStock()
-            ->latest()
-            ->paginate(20);
+            ->with(['category', 'brand', 'labels', 'lowestPrice']);
 
-        return view('front::products.index', compact('categories', 'products'));
+        if ($request->filled('s') && is_string($request->s)) {
+            $productsQuery->search($request->s);
+        }
+
+        if ($selectedCategory) {
+            $productsQuery->whereIn('category_id', $selectedCategory->allChildCategories());
+        }
+
+        if ($request->filled('child_category_id')) {
+            $childCategory = Category::detectLang()
+                ->published()
+                ->where('type', 'productcat')
+                ->find($request->integer('child_category_id'));
+
+            if ($childCategory) {
+                $productsQuery->whereIn('category_id', $childCategory->allChildCategories());
+            }
+        }
+
+        if ($request->filled('brand_id')) {
+            $productsQuery->where('brand_id', $request->integer('brand_id'));
+        }
+
+        if ($request->stock_status === 'in_stock') {
+            $productsQuery->available();
+        }
+
+        if ($request->stock_status === 'out_of_stock') {
+            $productsQuery->unavailable();
+        }
+
+        if ($request->boolean('discounted')) {
+            $productsQuery->discount();
+        }
+
+        if ($request->filled('min_price')) {
+            $productsQuery->whereHas('prices', function ($query) use ($request) {
+                $query->where('stock', '>', 0)->where('price', '>=', $request->integer('min_price'));
+            });
+        }
+
+        if ($request->filled('max_price')) {
+            $productsQuery->whereHas('prices', function ($query) use ($request) {
+                $query->where('stock', '>', 0)->where('price', '<=', $request->integer('max_price'));
+            });
+        }
+
+        switch ($request->input('sort_type', 'latest')) {
+            case 'view':
+                $productsQuery->orderBy('view', 'desc');
+                break;
+            case 'sale':
+                $productsQuery->orderBySale('desc');
+                break;
+            case 'cheapest':
+                $productsQuery->orderByPrice('asc');
+                break;
+            case 'expensivest':
+                $productsQuery->orderByPrice('desc');
+                break;
+            default:
+                $productsQuery->latest();
+                break;
+        }
+
+        $brands = Brand::detectLang()
+            ->whereHas('products', function ($query) {
+                $query->detectLang()->published();
+            })
+            ->orderBy('name')
+            ->get();
+
+        $priceRange = Price::query()
+            ->where('stock', '>', 0)
+            ->whereHas('product', function ($query) {
+                $query->detectLang()->published();
+            })
+            ->selectRaw('MIN(price) as min_price, MAX(price) as max_price')
+            ->first();
+
+        $products = $productsQuery
+            ->paginate(30)
+            ->withQueryString();
+
+        return view('front::products.index', compact(
+            'brands',
+            'categories',
+            'products',
+            'selectedCategory',
+            'subCategories',
+            'priceRange',
+        ));
     }
 
     public function category(Category $category)

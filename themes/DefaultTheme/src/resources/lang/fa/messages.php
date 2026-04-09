@@ -312,6 +312,21 @@ return [
         'filter'                   => 'فیلتر',
         'add-to-cart'              => 'افزودن به سبد',
         'special-sale'             => 'فروش ویژه',
+
+        'search-products'          => 'جستجوی محصولات',
+        'all-categories'           => 'همه دسته‌بندی‌ها',
+        'sub-category'             => 'زیر‌دسته‌بندی',
+        'all-sub-categories'       => 'همه زیر‌دسته‌بندی‌ها',
+        'all-brands'               => 'همه برندها',
+        'min-price'                => 'حداقل قیمت',
+        'max-price'                => 'حداکثر قیمت',
+        'stock-status'             => 'وضعیت موجودی',
+        'all-products'             => 'همه محصولات',
+        'only-unavailable-goods'   => 'فقط کالاهای ناموجود',
+        'discounted-only'          => 'فقط تخفیف‌دار',
+        'sort-by'                  => 'مرتب‌سازی',
+        'clear-filters'            => 'حذف فیلترها',
+        'products-count'           => ':count محصول یافت شد',
     ],
 
     'contact-us' => [
