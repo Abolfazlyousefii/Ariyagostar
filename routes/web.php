@@ -187,6 +187,7 @@ Route::group(['as' => 'admin.', 'prefix' => 'admin/' . admin_route_prefix(), 'mi
     Route::group(['prefix' => 'product'], function () {
         Route::get('categories', [ProductController::class, 'categories'])->name('products.categories.index');
         Route::delete('categories/bulk-destroy', [CategoryController::class, 'bulkDestroy'])->name('products.categories.bulkDestroy');
+        Route::delete('categories/destroy-all', [CategoryController::class, 'destroyAll'])->name('products.categories.destroyAll');
         Route::delete('categories/{category}', [CategoryController::class, 'destroy'])->name('products.categories.destroy');
     });
 
