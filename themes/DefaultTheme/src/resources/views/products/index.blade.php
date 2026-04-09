@@ -140,7 +140,7 @@
                         <div class="dt-sl dt-sn px-0 search-amazing-tab mt-3">
                             <div class="row mb-3 mx-0 px-res-0">
                                 @foreach($products as $product)
-                                    <div class="col-lg-4 col-md-4 col-sm-6 col-12 px-10 mb-1 px-res-0 category-product-div">
+                                    <div class="col-md-4 col-sm-6 col-12 px-10 mb-1 px-res-0 category-product-div product-grid-item">
                                         @include('front::products.partials.product-card', ['product' => $product])
                                     </div>
                                 @endforeach

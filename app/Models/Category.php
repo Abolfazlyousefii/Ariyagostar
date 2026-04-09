@@ -15,6 +15,8 @@ class Category extends Model implements Sitemapable
 {
     use sluggable, Taggable, CategoryRepository, Languageable;
 
+    public const MAIN_PRODUCT_CATEGORY_TITLES = ['mobile', 'موبایل', 'guard', 'گارد'];
+
     protected $guarded = ['id'];
 
     public function toSitemapTag(): Url|string|array
@@ -230,6 +232,18 @@ class Category extends Model implements Sitemapable
     public function scopePublished($query)
     {
         return $query->where('published', true);
+    }
+
+    public function scopeMainProductCategories($query)
+    {
+        return $query
+            ->where('type', 'productcat')
+            ->whereNull('category_id')
+            ->where(function ($query) {
+                foreach (self::MAIN_PRODUCT_CATEGORY_TITLES as $title) {
+                    $query->orWhereRaw('LOWER(title) = ?', [mb_strtolower($title)]);
+                }
+            });
     }
 
     public function isPublished()
