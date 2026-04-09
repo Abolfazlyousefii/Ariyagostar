@@ -7,6 +7,7 @@ use App\Models\Product;
 use Cviebrock\EloquentSluggable\Services\SlugService;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
@@ -17,6 +18,9 @@ class ProductExcelImportService
 {
     public function import(UploadedFile $file): array
     {
+        $hasProductImportFlag = Schema::hasColumn('products', 'created_by_import');
+        $hasCategoryImportFlag = Schema::hasColumn('categories', 'created_by_import');
+
         $summary = [
             'total_rows' => 0,
             'imported' => 0,
@@ -139,6 +143,10 @@ class ProductExcelImportService
                     'rounding_amount' => 'default',
                 ];
 
+                if ($hasProductImportFlag) {
+                    $data['created_by_import'] = true;
+                }
+
                 if ($product) {
                     $product->update($data);
                     $summary['updated']++;
@@ -147,7 +155,7 @@ class ProductExcelImportService
                     $summary['imported']++;
                 }
 
-                $categoryIds = $this->parseAndResolveCategories($categoriesRaw);
+                $categoryIds = $this->parseAndResolveCategories($categoriesRaw, $hasCategoryImportFlag);
 
                 if (!empty($categoryIds)) {
                     $product->categories()->sync($categoryIds);
@@ -173,7 +181,110 @@ class ProductExcelImportService
         return $summary;
     }
 
-    private function parseAndResolveCategories(string $categoriesRaw): array
+    public function cleanupImportedData(): array
+    {
+        $hasProductImportFlag = Schema::hasColumn('products', 'created_by_import');
+        $hasCategoryImportFlag = Schema::hasColumn('categories', 'created_by_import');
+
+        $summary = [
+            'deleted_products' => 0,
+            'deleted_category_relations' => 0,
+            'deleted_primary_category_links' => 0,
+            'deleted_categories' => 0,
+            'deleted_import_metadata' => 0,
+            'preserved_manual_products' => 0,
+            'preserved_existing_categories' => 0,
+        ];
+
+        return DB::transaction(function () use ($summary, $hasProductImportFlag, $hasCategoryImportFlag) {
+            $importedProductsQuery = Product::query()->whereNotNull('external_product_id');
+
+            if ($hasProductImportFlag) {
+                $importedProductsQuery->orWhere('created_by_import', true);
+            }
+
+            $importedProductIds = $importedProductsQuery->pluck('id');
+
+            if ($importedProductIds->isEmpty()) {
+                $summary['preserved_manual_products'] = Product::query()->count();
+                $summary['preserved_existing_categories'] = Category::query()->count();
+
+                return $summary;
+            }
+
+            $summary['deleted_category_relations'] = DB::table('category_product')
+                ->whereIn('product_id', $importedProductIds)
+                ->count();
+
+            $summary['deleted_primary_category_links'] = Product::query()
+                ->whereIn('id', $importedProductIds)
+                ->whereNotNull('category_id')
+                ->count();
+
+            $summary['deleted_import_metadata'] = Product::query()
+                ->whereIn('id', $importedProductIds)
+                ->whereNotNull('external_product_id')
+                ->count();
+
+            $summary['deleted_products'] = Product::query()
+                ->whereIn('id', $importedProductIds)
+                ->delete();
+
+            $protectedCategoryTitles = ['mobile', 'guard', 'موبایل', 'گارد'];
+
+            if ($hasCategoryImportFlag) {
+                while (true) {
+                    $deletableCategoryIds = Category::query()
+                        ->where('created_by_import', true)
+                        ->where('type', 'productcat')
+                        ->whereRaw('LOWER(title) NOT IN (?, ?, ?, ?)', $protectedCategoryTitles)
+                        ->whereNotExists(function ($query) {
+                            $query->select(DB::raw(1))
+                                ->from('category_product')
+                                ->whereColumn('category_product.category_id', 'categories.id');
+                        })
+                        ->whereNotExists(function ($query) {
+                            $query->select(DB::raw(1))
+                                ->from('products')
+                                ->whereColumn('products.category_id', 'categories.id');
+                        })
+                        ->whereNotExists(function ($query) {
+                            $query->select(DB::raw(1))
+                                ->from('categories as child_categories')
+                                ->whereColumn('child_categories.category_id', 'categories.id');
+                        })
+                        ->pluck('id');
+
+                    if ($deletableCategoryIds->isEmpty()) {
+                        break;
+                    }
+
+                    $summary['deleted_categories'] += Category::query()
+                        ->whereIn('id', $deletableCategoryIds)
+                        ->delete();
+                }
+            }
+
+            $summary['preserved_manual_products'] = Product::query()
+                ->whereNotIn('id', $importedProductIds)
+                ->count();
+
+            if ($hasCategoryImportFlag) {
+                $summary['preserved_existing_categories'] = Category::query()
+                    ->where(function ($query) {
+                        $query->where('created_by_import', false)
+                            ->orWhereNull('created_by_import');
+                    })
+                    ->count();
+            } else {
+                $summary['preserved_existing_categories'] = Category::query()->count();
+            }
+
+            return $summary;
+        });
+    }
+
+    private function parseAndResolveCategories(string $categoriesRaw, bool $hasCategoryImportFlag): array
     {
         if ($categoriesRaw === '') {
             return [];
@@ -206,13 +317,19 @@ class ProductExcelImportService
                 ->first();
 
             if (!$existing) {
-                $existing = Category::create([
+                $categoryData = [
                     'title' => $name,
                     'slug' => SlugService::createSlug(Category::class, 'slug', $name),
                     'type' => 'productcat',
                     'published' => true,
                     'lang' => app()->getLocale(),
-                ]);
+                ];
+
+                if ($hasCategoryImportFlag) {
+                    $categoryData['created_by_import'] = true;
+                }
+
+                $existing = Category::create($categoryData);
             }
 
             $categoryIds[] = $existing->id;

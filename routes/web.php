@@ -118,6 +118,7 @@ Route::group(['as' => 'admin.', 'prefix' => 'admin/' . admin_route_prefix(), 'mi
     Route::get('products/export/create', [ProductController::class, 'export'])->name('products.export');
     Route::get('products/import', [ProductImportController::class, 'index'])->name('products.import.index');
     Route::post('products/import', [ProductImportController::class, 'store'])->name('products.import.store');
+    Route::delete('products/import/cleanup', [ProductImportController::class, 'cleanup'])->name('products.import.cleanup');
     Route::get('products/import/sample', [ProductImportController::class, 'sample'])->name('products.import.sample');
 
     Route::get('product/torobPrices', [ProductController::class, 'torobPrices'])->name('product.torobPrices');
