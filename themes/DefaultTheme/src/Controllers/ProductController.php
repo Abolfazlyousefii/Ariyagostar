@@ -24,11 +24,11 @@ class ProductController extends Controller
     {
         $categories = Category::detectLang()
             ->published()
-            ->mainProductCategories()
+            ->whereNull('Category_id')
+            ->where('type', 'productcat')
             ->with(['childrenCategories' => function ($query) {
                 $query->published()->where('type', 'productcat')->orderBy('ordering');
             }])
-            ->orderByRaw("CASE WHEN LOWER(title) IN ('guard', 'گارد') THEN 1 ELSE 2 END")
             ->orderBy('ordering')
             ->get();
 
