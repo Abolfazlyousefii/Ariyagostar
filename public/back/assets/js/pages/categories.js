@@ -16,6 +16,53 @@ $(document).ready(function() {
     });
 
     var categories = $('.dd').nestable('serialize');
+    var hasBulkDelete = $('#bulk-delete-trigger').length > 0;
+
+    function getSelectedCategoryIds() {
+        return $('.category-bulk-checkbox:checked').map(function() {
+            return Number($(this).val());
+        }).get();
+    }
+
+    function getAllBulkCheckboxes() {
+        return $('.category-bulk-checkbox');
+    }
+
+    function toggleBulkActionsVisibility() {
+        if (!hasBulkDelete) {
+            return;
+        }
+
+        if (getAllBulkCheckboxes().length) {
+            $('#bulk-actions').show();
+        } else {
+            $('#bulk-actions').hide();
+        }
+    }
+
+    function updateBulkActionsState() {
+        if (!hasBulkDelete) {
+            return;
+        }
+
+        var selectedIds = getSelectedCategoryIds();
+        var allCount = getAllBulkCheckboxes().length;
+
+        $('#selected-count').text(selectedIds.length + ' مورد انتخاب شده');
+        $('#bulk-delete-trigger').prop('disabled', selectedIds.length === 0);
+        $('#bulk-delete-trigger').toggle(selectedIds.length > 0);
+
+        if (allCount > 0 && selectedIds.length === allCount) {
+            $('#select-all-categories').prop('checked', true);
+            $('#select-all-categories').prop('indeterminate', false);
+        } else if (selectedIds.length > 0) {
+            $('#select-all-categories').prop('checked', false);
+            $('#select-all-categories').prop('indeterminate', true);
+        } else {
+            $('#select-all-categories').prop('checked', false);
+            $('#select-all-categories').prop('indeterminate', false);
+        }
+    }
 
     $('#create-category').submit(function(e) {
         e.preventDefault();
@@ -28,12 +75,20 @@ $(document).ready(function() {
             data: formData,
             success: function(data) {
                 $('.dd-empty').remove();
+                var itemPrefix = '';
+
+                if (hasBulkDelete) {
+                    itemPrefix = '<span class="dd-nodrag mr-1" style="display: inline-flex; align-items: center;"><input type="checkbox" class="category-bulk-checkbox" value="' + data.id + '" aria-label="انتخاب دسته‌بندی ' + data.title + '"></span>';
+                }
+
                 $('.dd').nestable('add', {
                     "id": data.id,
-                    "content": '<span class="category-title">' + data.title + '</span><a data-category="' + data.slug + '" class="float-right delete-category dd-nodrag" href="javascript:void(0)" data-toggle="modal" data-target="#modal-delete"><i class="fa fa-trash text-danger px-1"></i>حذف</a><a data-category="' + data.slug + '" class="float-right edit-category dd-nodrag" href="javascript:void(0)"><i class="fa fa-pencil text-info px-1"></i>ویرایش</a>'
+                    "content": itemPrefix + '<span class="category-title">' + data.title + '</span><a data-category="' + data.slug + '" class="float-right delete-category dd-nodrag" href="javascript:void(0)" data-toggle="modal" data-target="#modal-delete"><i class="fa fa-trash text-danger px-1"></i>حذف</a><a data-category="' + data.slug + '" class="float-right edit-category dd-nodrag" href="javascript:void(0)"><i class="fa fa-pencil text-info px-1"></i>ویرایش</a>'
                 });
                 $('#create-category').trigger('reset');
                 categories = $('.dd').nestable('serialize');
+                toggleBulkActionsVisibility();
+                updateBulkActionsState();
             },
             beforeSend: function(xhr) {
                 block('#main-block');
@@ -51,6 +106,80 @@ $(document).ready(function() {
     $(document).on('click', '.delete-category', function() {
         var category = $(this).data('category');
         $('#delete-form').attr('action', deleteRouteBase + '/' + category);
+    });
+
+    $(document).on('change', '#select-all-categories', function() {
+        var checked = $(this).is(':checked');
+        getAllBulkCheckboxes().prop('checked', checked);
+        updateBulkActionsState();
+    });
+
+    $(document).on('change', '.category-bulk-checkbox', function() {
+        updateBulkActionsState();
+    });
+
+    $(document).on('click', '#bulk-delete-trigger', function() {
+        var selectedIds = getSelectedCategoryIds();
+
+        if (!selectedIds.length) {
+            if (typeof toastr !== 'undefined') {
+                toastr.warning('حداقل یک دسته‌بندی را انتخاب کنید.');
+            }
+            return;
+        }
+
+        $('#modal-bulk-delete').modal('show');
+    });
+
+    $(document).on('click', '#confirm-bulk-delete', function() {
+        var submitBtn = $(this);
+        var selectedIds = getSelectedCategoryIds();
+
+        if (!selectedIds.length) {
+            $('#modal-bulk-delete').modal('hide');
+            if (typeof toastr !== 'undefined') {
+                toastr.warning('هیچ دسته‌بندی انتخاب نشده است.');
+            }
+            return;
+        }
+
+        $.ajax({
+            url: bulkDeleteRoute,
+            type: 'post',
+            data: {
+                _method: 'DELETE',
+                category_ids: selectedIds,
+                type: $('input[name="type"]').first().val(),
+            },
+            success: function(response) {
+                $('#modal-bulk-delete').modal('hide');
+                if (typeof toastr !== 'undefined') {
+                    toastr.success(response.message);
+                    if (response.blocked && response.blocked.length) {
+                        toastr.warning('این دسته‌بندی‌ها حذف نشدند: ' + response.blocked.join('، '));
+                    }
+                }
+                window.location.reload();
+            },
+            error: function(xhr) {
+                var message = 'حذف گروهی انجام نشد.';
+                if (xhr.responseJSON && xhr.responseJSON.message) {
+                    message = xhr.responseJSON.message;
+                }
+                if (typeof toastr !== 'undefined') {
+                    toastr.error(message);
+                }
+            },
+            beforeSend: function(xhr) {
+                block('#main-block');
+                submitBtn.prop('disabled', true);
+                xhr.setRequestHeader('X-CSRF-TOKEN', $('meta[name="csrf-token"]').attr('content'));
+            },
+            complete: function() {
+                unblock('#main-block');
+                submitBtn.prop('disabled', false);
+            },
+        });
     });
 
     $(document).on('click', '.edit-category', function() {
@@ -189,4 +318,7 @@ $(document).ready(function() {
             $('#filter_id').prop('disabled', true);
         }
     });
+
+    toggleBulkActionsVisibility();
+    updateBulkActionsState();
 });

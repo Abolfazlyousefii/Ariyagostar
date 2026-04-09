@@ -6,6 +6,7 @@ use App\Models\Category;
 use App\Http\Controllers\Controller;
 use Cviebrock\EloquentSluggable\Services\SlugService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
 class CategoryController extends Controller
@@ -97,29 +98,93 @@ class CategoryController extends Controller
     {
         $this->authorizeCategory($category->type);
 
-        foreach (Category::whereIn('id', $category->allChildCategories())->get() as $child_category) {
-            if ($child_category->image) {
-                Storage::disk('public')->delete($child_category->image);
-            }
-            if ($child_category->background_image) {
-                Storage::disk('public')->delete($child_category->background_image);
-            }
-            $child_category->menus()->detach();
-            $child_category->delete();
-        }
-
-        if ($category->image) {
-            Storage::disk('public')->delete($category->image);
-        }
-        if ($category->background_image) {
-            Storage::disk('public')->delete($category->background_image);
-        }
-        $category->menus()->detach();
-        $category->delete();
+        $this->deleteCategoryTree($category);
 
         toastr()->success('دسته‌بندی با موفقیت حذف شد.');
 
         return redirect()->route($category->type == 'productcat' ? 'admin.products.categories.index' : 'admin.posts.categories.index');
+    }
+
+    public function bulkDestroy(Request $request)
+    {
+        $this->validate($request, [
+            'type' => 'required|string|in:productcat,postcat',
+            'category_ids' => 'required|array|min:1',
+            'category_ids.*' => 'integer|exists:categories,id',
+        ]);
+
+        $this->authorizeCategory($request->type);
+
+        $selectedIds = collect($request->category_ids)->map(fn ($id) => (int) $id)->unique()->values();
+
+        $categories = Category::query()
+            ->whereIn('id', $selectedIds)
+            ->where('type', $request->type)
+            ->get();
+
+        if ($categories->isEmpty()) {
+            return response()->json([
+                'message' => 'هیچ دسته‌بندی معتبری برای حذف انتخاب نشده است.',
+            ], 422);
+        }
+
+        $categoryMap = Category::query()
+            ->where('type', $request->type)
+            ->select('id', 'category_id', 'title')
+            ->get();
+
+        $childrenByParent = $categoryMap
+            ->groupBy('category_id')
+            ->map(fn ($items) => $items->pluck('id')->all());
+
+        $selectedLookup = $selectedIds->flip();
+        $rootCandidates = $categories->filter(function (Category $category) use ($selectedLookup) {
+            return !$category->category_id || !$selectedLookup->has((int) $category->category_id);
+        });
+
+        $deletedTitles = [];
+        $deletedCount = 0;
+        $blocked = [];
+
+        DB::transaction(function () use ($rootCandidates, $childrenByParent, &$deletedTitles, &$deletedCount, &$blocked) {
+            foreach ($rootCandidates as $category) {
+                $treeIds = $this->collectCategoryTreeIds($category->id, $childrenByParent);
+
+                $hasProducts = DB::table('products')->whereIn('category_id', $treeIds)->exists()
+                    || DB::table('category_product')->whereIn('category_id', $treeIds)->exists();
+
+                if ($hasProducts) {
+                    $blocked[] = $category->title;
+                    continue;
+                }
+
+                $this->deleteCategoryTree($category, $treeIds);
+                $deletedTitles[] = $category->title;
+                $deletedCount += count($treeIds);
+            }
+        });
+
+        $blocked = array_values(array_unique($blocked));
+
+        if ($deletedCount === 0 && !empty($blocked)) {
+            return response()->json([
+                'message' => 'هیچ دسته‌بندی حذف نشد. برخی دسته‌بندی‌های انتخابی به محصولات متصل هستند.',
+                'blocked' => $blocked,
+            ], 422);
+        }
+
+        $message = sprintf('حذف گروهی انجام شد. %s دسته‌بندی حذف شد.', $deletedCount);
+
+        if (!empty($blocked)) {
+            $message .= ' برخی دسته‌بندی‌ها به دلیل ارتباط با محصولات حذف نشدند.';
+        }
+
+        return response()->json([
+            'message' => $message,
+            'deleted' => $deletedTitles,
+            'deleted_count' => $deletedCount,
+            'blocked' => $blocked,
+        ]);
     }
 
     public function sort(Request $request)
@@ -156,6 +221,48 @@ class CategoryController extends Controller
             case "productcat":
                 $this->authorize('products.category');
                 break;
+        }
+    }
+
+    private function collectCategoryTreeIds(int $categoryId, $childrenByParent): array
+    {
+        $treeIds = [$categoryId];
+        $stack = [$categoryId];
+
+        while (!empty($stack)) {
+            $current = array_pop($stack);
+            $children = $childrenByParent->get($current, []);
+
+            foreach ($children as $childId) {
+                if (!in_array($childId, $treeIds, true)) {
+                    $treeIds[] = $childId;
+                    $stack[] = $childId;
+                }
+            }
+        }
+
+        return $treeIds;
+    }
+
+    private function deleteCategoryTree(Category $category, ?array $treeIds = null): void
+    {
+        $treeIds = $treeIds ?: $category->allChildCategories();
+
+        $categories = Category::query()
+            ->whereIn('id', $treeIds)
+            ->orderByRaw('category_id IS NULL ASC')
+            ->get();
+
+        foreach ($categories as $categoryItem) {
+            if ($categoryItem->image) {
+                Storage::disk('public')->delete($categoryItem->image);
+            }
+            if ($categoryItem->background_image) {
+                Storage::disk('public')->delete($categoryItem->background_image);
+            }
+
+            $categoryItem->menus()->detach();
+            $categoryItem->delete();
         }
     }
 
