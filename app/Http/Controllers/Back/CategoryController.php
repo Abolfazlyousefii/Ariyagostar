@@ -149,11 +149,13 @@ class CategoryController extends Controller
             foreach ($rootCandidates as $category) {
                 $treeIds = $this->collectCategoryTreeIds($category->id, $childrenByParent);
 
-                $hasProducts = DB::table('products')->whereIn('category_id', $treeIds)->exists()
-                    || DB::table('category_product')->whereIn('category_id', $treeIds)->exists();
+                $relationStats = $this->getBlockingRelationStats($category->type, $treeIds);
 
-                if ($hasProducts) {
-                    $blocked[] = $category->title;
+                if ($relationStats['has_blocking_relation']) {
+                    $blocked[] = [
+                        'title' => $category->title,
+                        'reason' => $relationStats['reason'],
+                    ];
                     continue;
                 }
 
@@ -164,21 +166,25 @@ class CategoryController extends Controller
 
         if (empty($deletedTitles) && !empty($blocked)) {
             return response()->json([
-                'message' => 'هیچ دسته‌بندی حذف نشد. برخی دسته‌بندی‌های انتخابی به محصولات متصل هستند.',
+                'message' => 'هیچ دسته‌بندی حذف نشد. برخی دسته‌بندی‌های انتخابی به داده‌های وابسته متصل هستند.',
                 'blocked' => $blocked,
+                'deleted_count' => 0,
+                'blocked_count' => count($blocked),
             ], 422);
         }
 
         $message = sprintf('حذف گروهی انجام شد. %s دسته‌بندی حذف شد.', count($deletedTitles));
 
         if (!empty($blocked)) {
-            $message .= ' برخی دسته‌بندی‌ها به دلیل ارتباط با محصولات حذف نشدند.';
+            $message .= sprintf(' %s دسته‌بندی به‌دلیل ارتباط داده‌ای حذف نشد.', count($blocked));
         }
 
         return response()->json([
             'message' => $message,
             'deleted' => $deletedTitles,
+            'deleted_count' => count($deletedTitles),
             'blocked' => $blocked,
+            'blocked_count' => count($blocked),
         ]);
     }
 
@@ -259,6 +265,27 @@ class CategoryController extends Controller
             $categoryItem->menus()->detach();
             $categoryItem->delete();
         }
+    }
+
+    private function getBlockingRelationStats(string $type, array $treeIds): array
+    {
+        if ($type === 'postcat') {
+            $postsCount = DB::table('posts')->whereIn('category_id', $treeIds)->count();
+
+            return [
+                'has_blocking_relation' => $postsCount > 0,
+                'reason' => "اتصال به {$postsCount} نوشته",
+            ];
+        }
+
+        $primaryProductCount = DB::table('products')->whereIn('category_id', $treeIds)->count();
+        $pivotProductCount = DB::table('category_product')->whereIn('category_id', $treeIds)->count();
+        $totalProductRelations = $primaryProductCount + $pivotProductCount;
+
+        return [
+            'has_blocking_relation' => $totalProductRelations > 0,
+            'reason' => "اتصال به {$totalProductRelations} رابطه محصول",
+        ];
     }
 
     public function generate_slug(Request $request)
