@@ -310,6 +310,21 @@ return [
         'filter'                   => 'Filter',
         'add-to-cart'              => 'Add to cart',
         'special-sale'             => 'Special sale',
+
+        'search-products'          => 'Search products',
+        'all-categories'           => 'All categories',
+        'sub-category'             => 'Subcategory',
+        'all-sub-categories'       => 'All subcategories',
+        'all-brands'               => 'All brands',
+        'min-price'                => 'Min price',
+        'max-price'                => 'Max price',
+        'stock-status'             => 'Stock status',
+        'all-products'             => 'All products',
+        'only-unavailable-goods'   => 'Only unavailable products',
+        'discounted-only'          => 'Discounted only',
+        'sort-by'                  => 'Sort by',
+        'clear-filters'            => 'Clear filters',
+        'products-count'           => ':count products found',
     ],
 
     'contact-us' => [
