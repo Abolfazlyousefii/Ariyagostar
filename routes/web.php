@@ -5,7 +5,6 @@ use App\Http\Controllers\Back\ProvinceController;
 use App\Http\Controllers\Back\MainController;
 use App\Http\Controllers\Back\UserController;
 use App\Http\Controllers\Back\ProductController;
-use App\Http\Controllers\Back\ProductImportController;
 use App\Http\Controllers\Back\BrandController;
 use App\Http\Controllers\Back\FilterController;
 use App\Http\Controllers\Back\AttributeGroupController;
@@ -116,10 +115,6 @@ Route::group(['as' => 'admin.', 'prefix' => 'admin/' . admin_route_prefix(), 'mi
     Route::post('product/slug', [ProductController::class, 'generate_slug']);
 
     Route::get('products/export/create', [ProductController::class, 'export'])->name('products.export');
-    Route::get('products/import', [ProductImportController::class, 'index'])->name('products.import.index');
-    Route::post('products/import', [ProductImportController::class, 'store'])->name('products.import.store');
-    Route::get('products/import/sample', [ProductImportController::class, 'sample'])->name('products.import.sample');
-
     Route::get('product/torobPrices', [ProductController::class, 'torobPrices'])->name('product.torobPrices');
     Route::get('product/torobImport', [ProductController::class, 'torobImport'])->name('product.torobImport');
     Route::post('product/torobUpload', [ProductController::class, 'torobUpload'])->name('product.torobUpload');
