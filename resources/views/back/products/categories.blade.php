@@ -56,10 +56,24 @@
                                     </div>
                                 </form>
 
+                                <div id="bulk-actions" class="d-flex align-items-center justify-content-between flex-wrap mt-3" style="display: none;">
+                                    <div class="form-check form-check-inline mb-0">
+                                        <input class="form-check-input" type="checkbox" id="select-all-categories">
+                                        <label class="form-check-label" for="select-all-categories">انتخاب همه</label>
+                                    </div>
+                                    <div class="mt-1 mt-md-0">
+                                        <span id="selected-count" class="text-muted mr-1">0 مورد انتخاب شده</span>
+                                        <button type="button" id="bulk-delete-trigger" class="btn btn-danger waves-effect waves-light" disabled>
+                                            <i class="fa fa-trash ml-50"></i>
+                                            حذف گروهی
+                                        </button>
+                                    </div>
+                                </div>
+
                                 <div class="dd mt-4">
                                     <ol class="dd-list">
                                         @foreach ($categories as $category)
-                                            @include('back.partials.child_category', ['child_category' => $category])
+                                            @include('back.partials.child_category', ['child_category' => $category, 'enableBulkDelete' => true])
                                         @endforeach
                                     </ol>
                                 </div>
@@ -99,6 +113,26 @@
         </div>
     </div>
 
+    <div class="modal fade text-left" id="modal-bulk-delete" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-sm" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">تأیید حذف گروهی</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p class="mb-0">دسته‌بندی‌های انتخاب‌شده حذف می‌شوند. اگر هر دسته یا زیر‌دسته به محصولی متصل باشد حذف نخواهد شد.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success waves-effect waves-light" data-dismiss="modal">انصراف</button>
+                    <button type="button" id="confirm-bulk-delete" class="btn btn-danger waves-effect waves-light">بله، حذف شود</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="modal fade text-left" id="modal-edit" tabindex="-1" role="dialog" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document" style="max-width: 900px; width: 90vw;">
             <div class="modal-content">
@@ -134,6 +168,7 @@
     <script>
         var maxDepth = 10;
         var deleteRouteBase = '{{ route("admin.products.categories.destroy", "") }}';
+        var bulkDeleteRoute = '{{ route("admin.products.categories.bulkDestroy") }}';
         var BASE_URL = '{{ url('/') }}';
         var adminRoutePrefix = '{{ admin_route_prefix() }}';
     </script>
