@@ -42,7 +42,6 @@ class UpdateProductRequest extends FormRequest
             'rounding_type'    => 'required|in:default,close,up,down',
             'currency_id'      => 'nullable|exists:currencies,id',
             'stock_increase_sms'=> 'in:true,false',
-            'compatible_models'=> 'nullable|string|max:5000'
         ];
 
         if ($this->input('type') == 'physical') {
