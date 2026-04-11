@@ -13,7 +13,6 @@ use App\Http\Requests\Back\Product\UpdateProductRequest;
 use App\Http\Resources\Api\V1\Product\ProductTorobCollection;
 use App\Http\Resources\Datatable\Product\ProductCollection;
 use App\Models\Currency;
-use App\Models\CompatibleModel;
 use App\Models\Label;
 use App\Models\Price;
 use App\Models\Product;
@@ -185,9 +184,6 @@ class ProductController extends Controller
         // update product sizes
         $this->updateProductSizes($product, $request);
 
-        // update compatible models
-        $this->updateProductCompatibleModels($product, $request);
-
         toastr()->success('محصول با موفقیت ایجاد شد.');
 
         return response("success");
@@ -325,9 +321,6 @@ class ProductController extends Controller
 
         // update product sizes
         $this->updateProductSizes($product, $request);
-
-        // update compatible models
-        $this->updateProductCompatibleModels($product, $request);
 
         // update product torob
         $this->updateProductTorob($product, $request);
@@ -914,33 +907,6 @@ class ProductController extends Controller
         }
 
         $product->labels()->sync($label_ids);
-    }
-
-    private function updateProductCompatibleModels(Product $product, Request $request)
-    {
-        $models = collect(explode(',', (string) $request->input('compatible_models')))
-            ->map(fn($item) => trim($item))
-            ->filter()
-            ->unique(fn($item) => mb_strtolower($item))
-            ->values();
-
-        if ($models->isEmpty()) {
-            $product->compatibleModels()->sync([]);
-            CompatibleModel::doesntHave('products')->delete();
-
-            return;
-        }
-
-        $modelIds = [];
-
-        foreach ($models as $modelName) {
-            $modelIds[] = CompatibleModel::firstOrCreate([
-                'name' => $modelName,
-            ])->id;
-        }
-
-        $product->compatibleModels()->sync($modelIds);
-        CompatibleModel::doesntHave('products')->delete();
     }
 
     private function updateProductSizes(Product $product, Request $request)

@@ -147,13 +147,6 @@
                                                                         <input type="text" name="labels" class="form-control labels" data-action="{{ route('admin.get-labels') }}" value="{{ $product->getLabels() }}">
                                                                     </fieldset>
                                                                 </div>
-                                                                <div class="col-md-6">
-                                                                    <fieldset class="form-group">
-                                                                        <label>مدل‌های سازگار</label>
-                                                                        <input type="text" name="compatible_models" class="form-control compatible-models" value="{{ $product->compatibleModels()->pluck('name')->implode(',') }}">
-                                                                        <small class="text-muted">مدل‌ها را با Enter یا کاما جدا کنید. مثال: A54, A34, iPhone 13</small>
-                                                                    </fieldset>
-                                                                </div>
 
                                                                 <div class="col-md-6">
                                                                     <div class="form-group">
