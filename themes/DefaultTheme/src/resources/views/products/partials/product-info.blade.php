@@ -36,6 +36,31 @@
                 @endif
 
                 @php
+                    $compatibleModels = $product->compatibleModels;
+                    $showCompatibleModels = $product->shouldShowCompatibleModelsSection() && $compatibleModels->count();
+                @endphp
+
+                @if ($showCompatibleModels)
+                    <div class="compatible-models-section dt-sl mb-3">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <h4 class="compatible-models-title mb-2">مدل‌های سازگار</h4>
+                            <span class="compatible-models-count">{{ $compatibleModels->count() }} مدل</span>
+                        </div>
+                        <div class="compatible-models-list">
+                            @foreach ($compatibleModels as $compatibleModel)
+                                <span class="compatible-model-chip {{ $loop->index >= 10 ? 'compatible-model-chip--hidden d-none' : '' }}">{{ $compatibleModel->name }}</span>
+                            @endforeach
+                        </div>
+
+                        @if ($compatibleModels->count() > 10)
+                            <button type="button" class="btn btn-link p-0 mt-2 compatible-models-toggle" data-expanded="0">
+                                نمایش بیشتر
+                            </button>
+                        @endif
+                    </div>
+                @endif
+
+                @php
                     $specialSpecifications = $product->specialSpecifications();
                 @endphp
 
@@ -249,3 +274,59 @@
         </div>
     </div>
 </div>
+
+@push('styles')
+    <style>
+        .compatible-models-section {
+            border: 1px solid #edf0f5;
+            border-radius: 12px;
+            padding: 14px;
+            background: #fafcff;
+        }
+
+        .compatible-models-title {
+            font-size: 1rem;
+            font-weight: 700;
+        }
+
+        .compatible-models-count {
+            font-size: .8rem;
+            color: #6f7b8a;
+        }
+
+        .compatible-models-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .compatible-model-chip {
+            background: #eef3ff;
+            border: 1px solid #dbe6ff;
+            color: #2f4c8f;
+            border-radius: 999px;
+            padding: 5px 12px;
+            font-size: .82rem;
+            line-height: 1.7;
+        }
+    </style>
+@endpush
+
+@push('scripts')
+    <script>
+        $(document).on('click', '.compatible-models-toggle', function () {
+            const $button = $(this);
+            const expanded = $button.data('expanded') === 1;
+            const $container = $button.closest('.compatible-models-section');
+            const $hiddenItems = $container.find('.compatible-model-chip--hidden');
+
+            if (expanded) {
+                $hiddenItems.addClass('d-none');
+                $button.text('نمایش بیشتر').data('expanded', 0);
+            } else {
+                $hiddenItems.removeClass('d-none');
+                $button.text('نمایش کمتر').data('expanded', 1);
+            }
+        });
+    </script>
+@endpush

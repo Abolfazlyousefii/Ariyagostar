@@ -40,7 +40,8 @@ class StoreProductRequest extends FormRequest
             'discount_expire'  => 'nullable',
             'rounding_amount'  => 'required|in:default,no,100,1000,10000,100000',
             'rounding_type'    => 'required|in:default,close,up,down',
-            'currency_id'      => 'nullable|exists:currencies,id'
+            'currency_id'      => 'nullable|exists:currencies,id',
+            'compatible_models'=> 'nullable|string|max:5000'
         ];
 
         if ($this->input('type') == 'physical') {

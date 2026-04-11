@@ -14,6 +14,12 @@ $('.labels').tagsInput({
     autocomplete_url: $('.labels').data('action')
 });
 
+$('.compatible-models').tagsInput({
+    defaultText: 'افزودن مدل',
+    width: '100%',
+    height: '110px'
+});
+
 $('.product-category').select2ToTree({
     rtl: true,
     width: '100%'

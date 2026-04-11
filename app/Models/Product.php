@@ -7,6 +7,7 @@ use App\Traits\Taggable;
 use App\Traits\Languageable;
 use Spatie\Sitemap\Tags\Url;
 use App\Traits\ProductScopes;
+use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Route;
@@ -52,6 +53,11 @@ class Product extends Model implements Sitemapable
     public function categories()
     {
         return $this->belongsToMany(Category::class);
+    }
+
+    public function compatibleModels()
+    {
+        return $this->belongsToMany(CompatibleModel::class)->orderBy('name');
     }
 
     public function gallery()
@@ -244,6 +250,23 @@ class Product extends Model implements Sitemapable
     public function isUserFavorite()
     {
         return auth()->check() && auth()->user()->favorites()->where('product_id', $this->id)->first();
+    }
+
+    public function shouldShowCompatibleModelsSection()
+    {
+        $keywords = ['گارد', 'گلس', 'guard', 'glass'];
+
+        $categories = collect([$this->category])
+            ->filter()
+            ->merge($this->categories)
+            ->flatMap(function ($category) {
+                return collect([$category])->merge($category->parents());
+            })
+            ->unique('id');
+
+        return $categories->contains(function ($category) use ($keywords) {
+            return Str::contains(Str::lower($category->title . ' ' . $category->slug), $keywords);
+        });
     }
 
     public function getLowestPrice($numeric = false, $major_price = false)
